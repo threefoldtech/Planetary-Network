@@ -77,6 +77,8 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	settingsMenuAction.ConnectTriggered(func(bool) {
 		println("Showing window ...")
 		window.Show()
+		window.ActivateWindow()
+		window.Raise()
 	})
 
 	yggdrasilVersionMenuAction := systrayMenu.AddAction("Reset")

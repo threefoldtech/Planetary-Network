@@ -43,7 +43,9 @@ func disconnect(c *gin.Context) {
 	n.shutdown()
 }
 func exit(c *gin.Context) {
-
+	if n.admin.IsStarted() {
+		n.shutdown()
+	}
 	c.IndentedJSON(http.StatusOK, "Shutting down")
 	os.Exit(0)
 }
