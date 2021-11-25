@@ -27,7 +27,7 @@ func checkRoot() bool {
 		var widget = widgets.NewQWidget(nil, 0)
 		var dialog = widgets.NewQInputDialog(widget, core.Qt__Dialog)
 		dialog.SetWindowTitle("ThreeFold Network Connector")
-		dialog.SetLabelText("ThreeFold Network Connector would like to automatically\nset up your connection to the ThreeFold Network.\n\nTo do this,  please provide the password for \"" + getUsername() + "\"")
+		dialog.SetLabelText("ThreeFold Network Connector would like to automatically\nset up your connection to the ThreeFold Network.\n\nTo do this, please provide the password for \"" + getUsername() + "\"")
 		dialog.SetTextEchoMode(widgets.QLineEdit__Password)
 		dialog.SetInputMethodHints(core.Qt__ImhNone)
 
@@ -46,6 +46,7 @@ func checkRoot() bool {
 
 		fmt.Println("Starting server as root")
 		elevateMyself(password)
+		cleanupYggdrasilSock(password) //we just kill all yggdrasil sockets. If you already have ygg running it will be killed.
 	}
 	time.Sleep(2 * time.Second)
 	_, err2 := http.Get("http://localhost:62853/health")
