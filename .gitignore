@@ -7,3 +7,5 @@ deploy
 *_amd64.go
 moc.go
 vendor
+tf-network-connector-linux
+*.deb

@@ -1,0 +1,5 @@
+Package: tf-networkconnector
+Version: 0.4
+Maintainer: Threefold Foundation
+Architecture: all
+Description: Connector for planetary network
