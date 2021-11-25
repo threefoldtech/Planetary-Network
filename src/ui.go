@@ -22,6 +22,7 @@ var subnetLabel *widgets.QLabel
 var debugLabel *widgets.QLabel
 var connectionLabel *widgets.QLabel
 var connectButton *widgets.QPushButton
+var window *widgets.QMainWindow
 
 type QSystemTrayIconWithCustomSlot struct {
 	widgets.QSystemTrayIcon
@@ -52,6 +53,29 @@ func uiDisconnect() {
 	http.Post("http://localhost:62853/disconnect", "application/json", bytes.NewBuffer(nil))
 }
 
+func getCurrentConnectionInfo() ConnectionInfo {
+
+	resp, err := http.Get("http://localhost:62853/connection")
+
+	if err != nil {
+		fmt.Println("Err on connect")
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	var connectionInfo = &ConnectionInfo{}
+	err = json.Unmarshal([]byte(body), connectionInfo)
+	return *connectionInfo
+
+}
+func raiseWindow() {
+	println("Raising window ...")
+	window.Show()
+	// window.SetWindowFlags(core.Qt__WindowStaysOnTopHint)
+	window.ActivateWindow()
+	window.Raise()
+}
 func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	app := widgets.NewQApplication(len(os.Args), os.Args)
@@ -59,7 +83,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	time.Sleep(2 * time.Second)
 	checkRoot()
 
-	window := widgets.NewQMainWindow(nil, 0)
+	window = widgets.NewQMainWindow(nil, 0)
 
 	window.SetMinimumSize2(600, 140)
 	window.SetWindowTitle("ThreeFold network connector")
@@ -77,6 +101,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	settingsMenuAction.ConnectTriggered(func(bool) {
 		println("Showing window ...")
 		window.Show()
+		// window.SetWindowFlags(core.Qt__WindowStaysOnTopHint)
 		window.ActivateWindow()
 		window.Raise()
 	})
@@ -181,6 +206,24 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	ipLabel = widgets.NewQLabel2("N/A", nil, 0)
 	subnetLabel = widgets.NewQLabel2("N/A", nil, 0)
 	//	debugLabel = widgets.NewQLabel2("Debug info", nil, 0)
+
+	println("Checking current connection")
+	connInfo := getCurrentConnectionInfo()
+	println("Checking current connection -> ", connInfo.IpAddress)
+	if connInfo.IpAddress != "" {
+
+		connectButton.SetText("Disconnect")
+		ipLabel.SetText(connInfo.IpAddress)
+		subnetLabel.SetText(connInfo.SubnetAddress)
+
+		connectionState = true
+		connectionLabel.SetText("Connected")
+		connectionLabel.SetStyleSheet("QLabel {color: green;}")
+
+		ipLabel.SetText(connInfo.IpAddress)
+		subnetLabel.SetText(connInfo.SubnetAddress)
+
+	}
 
 	gridLayout.AddWidget2(ipLabelInfo, 2, 0, core.Qt__AlignLeft)
 	gridLayout.AddWidget2(ipLabel, 2, 1, core.Qt__AlignCenter)
