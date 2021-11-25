@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/yggdrasil-desktop-client
+Name=Threefold Network Connector
+Comment=Threefold Network Connector
+Icon=/usr/share/icons/tf.ico

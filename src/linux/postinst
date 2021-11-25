@@ -1,0 +1,3 @@
+#!/bin/bash
+chmod +x /usr/share/tf/threefold-networkconnector.desktop
+xdg-desktop-menu install /usr/share/tf/threefold-networkconnector.desktop
