@@ -19,7 +19,7 @@ func startServer() {
 	router.GET("/health", health)
 	router.POST("/exit", exit)
 	router.POST("/reset", reset)
-	router.Run("127.0.0.1:7070")
+	router.Run("127.0.0.1:62853")
 	return
 
 }

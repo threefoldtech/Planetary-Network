@@ -33,7 +33,7 @@ func (tray *QSystemTrayIconWithCustomSlot) triggerSlot(f func()) { f() } //the s
 
 func uiConnect() ConnectionInfo {
 	http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 10
-	resp, err := http.Post("http://localhost:7070/connect", "application/json", bytes.NewBuffer(nil))
+	resp, err := http.Post("http://localhost:62853/connect", "application/json", bytes.NewBuffer(nil))
 
 	if err != nil {
 		fmt.Println("Err on connect")
@@ -49,7 +49,7 @@ func uiConnect() ConnectionInfo {
 }
 
 func uiDisconnect() {
-	http.Post("http://localhost:7070/disconnect", "application/json", bytes.NewBuffer(nil))
+	http.Post("http://localhost:62853/disconnect", "application/json", bytes.NewBuffer(nil))
 }
 
 func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
@@ -81,7 +81,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	yggdrasilVersionMenuAction := systrayMenu.AddAction("Reset")
 	yggdrasilVersionMenuAction.ConnectTriggered(func(bool) {
-		http.Post("http://localhost:7070/reset", "application/json", bytes.NewBuffer(nil))
+		http.Post("http://localhost:62853/reset", "application/json", bytes.NewBuffer(nil))
 		widgets.QMessageBox_Information(nil, "ThreeFold network connector", "All the settings have been reset.\n The application will close itself. \n\n You can simply open it again.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 		os.Exit(0)
 	})
@@ -89,7 +89,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	quitMenuAction := systrayMenu.AddAction("Quit")
 	quitMenuAction.ConnectTriggered(func(bool) {
 		println("Exiting application ... ")
-		http.Post("http://localhost:7070/exit", "application/json", bytes.NewBuffer(nil))
+		http.Post("http://localhost:62853/exit", "application/json", bytes.NewBuffer(nil))
 		app.Exit(0)
 		os.Exit(0)
 	})
@@ -123,11 +123,16 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	connectButton.ConnectClicked(func(bool) {
 		if !connectionState {
-			connectButton.SetText("Disconnect")
+
 			ipLabel.SetText("...")
 			subnetLabel.SetText("...")
 
 			connInfo := uiConnect()
+			if connInfo.Error != "" {
+				widgets.QMessageBox_Critical(nil, "Yggdrasil already running", " You already have an Yggdrasil client running. Can't connect.", widgets.QMessageBox__Ok, 0)
+				return
+			}
+			connectButton.SetText("Disconnect")
 			ipLabel.SetText(connInfo.IpAddress)
 			subnetLabel.SetText(connInfo.SubnetAddress)
 

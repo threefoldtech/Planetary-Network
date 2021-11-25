@@ -10,4 +10,5 @@ type ConnectionInfo struct {
 	IpAddress     string
 	SubnetAddress string
 	PublicKey     string
+	Error         string
 }

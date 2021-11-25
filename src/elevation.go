@@ -15,7 +15,7 @@ import (
 
 func checkRoot() bool {
 	http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 1
-	_, err := http.Get("http://localhost:7070/health")
+	_, err := http.Get("http://localhost:62853/health")
 
 	if err != nil {
 
@@ -48,7 +48,7 @@ func checkRoot() bool {
 		elevateMyself(password)
 	}
 	time.Sleep(2 * time.Second)
-	_, err2 := http.Get("http://localhost:7070/health")
+	_, err2 := http.Get("http://localhost:62853/health")
 	if err2 != nil {
 		checkRoot()
 	}
