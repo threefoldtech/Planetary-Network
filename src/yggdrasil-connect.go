@@ -17,6 +17,16 @@ import (
 
 var n node
 
+func yggdrasilDisconnect() ConnectionInfo {
+	n.shutdown()
+	connInfo := ConnectionInfo{
+		IpAddress:     "",
+		SubnetAddress: "",
+		PublicKey:     "",
+		Error:         "",
+	}
+	return connInfo
+}
 func yggdrasilConnect() ConnectionInfo {
 
 	// defer close(done)

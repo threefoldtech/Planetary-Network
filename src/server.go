@@ -40,7 +40,7 @@ func connect(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, info)
 }
 func disconnect(c *gin.Context) {
-	n.shutdown()
+	info = yggdrasilDisconnect()
 }
 func exit(c *gin.Context) {
 	if n.admin.IsStarted() {
