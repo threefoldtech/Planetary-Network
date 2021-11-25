@@ -21,6 +21,17 @@ func yggdrasilConnect() ConnectionInfo {
 
 	// defer close(done)
 
+	if _, err := os.Stat("/var/run/yggdrasil.sock"); err == nil {
+		connInfo := ConnectionInfo{
+			IpAddress:     "N/A",
+			SubnetAddress: "N/A",
+			PublicKey:     "N/A",
+			Error:         "Yggdrasil is already running",
+		}
+		return connInfo
+
+	}
+
 	var logger *log.Logger
 
 	logger = log.New(os.Stdout, "", log.Flags())
@@ -90,6 +101,7 @@ func yggdrasilConnect() ConnectionInfo {
 		IpAddress:     address.String(),
 		SubnetAddress: subnet.String(),
 		PublicKey:     hex.EncodeToString(public[:]),
+		Error:         "",
 	}
 	return connInfo
 
