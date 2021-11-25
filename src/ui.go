@@ -86,6 +86,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	window = widgets.NewQMainWindow(nil, 0)
 
 	window.SetMinimumSize2(600, 140)
+	window.SetFixedSize(core.NewQSize2(600, 140))
 	window.SetWindowTitle("ThreeFold network connector")
 
 	widget := widgets.NewQWidget(nil, 0)
