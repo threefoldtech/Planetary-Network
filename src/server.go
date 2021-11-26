@@ -11,6 +11,13 @@ import (
 var info ConnectionInfo
 
 func startServer() {
+	info = ConnectionInfo{
+		IpAddress:     "",
+		SubnetAddress: "",
+		PublicKey:     "",
+		Error:         "",
+	}
+
 	fmt.Println("Running in server mode")
 	router := gin.Default()
 	router.GET("/connection", getConnection)
@@ -43,7 +50,7 @@ func disconnect(c *gin.Context) {
 	info = yggdrasilDisconnect()
 }
 func exit(c *gin.Context) {
-	if n.admin.IsStarted() {
+	if info.IpAddress != "" {
 		n.shutdown()
 	}
 	c.IndentedJSON(http.StatusOK, "Shutting down")

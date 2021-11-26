@@ -9,3 +9,4 @@ moc.go
 vendor
 tf-network-connector-linux
 *.deb
+yggdrasil-desktop-client
