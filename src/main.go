@@ -12,6 +12,9 @@ import (
 )
 
 func main() {
+	init_config()
+	fmt.Println("Hello windows")
+
 	server := flag.Bool("server", false, "Yggdrasil root server")
 	flag.Parse()
 
