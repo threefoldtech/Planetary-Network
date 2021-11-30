@@ -55,10 +55,10 @@ func yggdrasilConnect() ConnectionInfo {
 	var cfg *config.NodeConfig
 	var err error
 
-	if !fileExists("/etc/threefold_yggdrasil.conf") {
+	if !fileExists("yggdrasil_config_location") {
 		generateConfigFile(cfg)
 	}
-	cfg = readConfig(logger, true, "/etc/threefold_yggdrasil.conf", false)
+	cfg = readConfig(logger, true, "yggdrasil_config_location", false)
 
 	logger.Errorln("An error occurred during startup")
 	fmt.Println("Private key in config is ", cfg.PrivateKey)
@@ -124,7 +124,7 @@ func resetApplication() {
 		fmt.Println(err)
 	}
 
-	err = os.Remove("/etc/threefold_yggdrasil.conf")
+	err = os.Remove("yggdrasil_config_location")
 
 	if err != nil {
 		fmt.Println(err)

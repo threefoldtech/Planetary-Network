@@ -77,6 +77,8 @@ func elevateMyself(password string) {
 	fmt.Println(exPath)
 
 	cmd := "echo " + password + " | sudo -S \"" + ex + "\" -server"
+	// +build windows
+	cmd := ex + "\" -server"
 	rcmd := exec.Command("bash", "-c", cmd)
 	err := rcmd.Start()
 
@@ -84,7 +86,6 @@ func elevateMyself(password string) {
 		fmt.Println(err)
 		// os.Exit(1)
 	}
-
 }
 
 func getUsername() string {
