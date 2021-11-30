@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/go-ping/ping"
-	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly"
 	"github.com/yggdrasil-network/yggdrasil-go/src/config"
 	"github.com/yggdrasil-network/yggdrasil-go/src/defaults"
 )
