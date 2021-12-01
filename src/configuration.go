@@ -46,7 +46,7 @@ func generateConfigFile(cfg *config.NodeConfig) {
 	fmt.Println("Peers replaced")
 	fmt.Println("[info]: Peers replaced")
 
-	f, err := os.Create("yggdrasil_config_location")
+	f, err := os.Create(app_config.yggdrasil_config_location)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("[err01]: " + err.Error())

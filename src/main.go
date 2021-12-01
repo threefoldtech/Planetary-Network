@@ -20,6 +20,7 @@ func main() {
 
 	if *server { //check if started as server
 		startServer()
+
 	} else {
 
 		http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 1
