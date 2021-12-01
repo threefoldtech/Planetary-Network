@@ -8,10 +8,11 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func checkNetworkServerRunningOrStart_Win() {
-	startNetworkServerAsRoot_win()
+func startNetworkServer() {
+	startNetworkServerAsAdmin()
 }
-func startNetworkServerAsRoot_win() {
+
+func startNetworkServerAsAdmin() {
 	verb := "runas"
 	exe, _ := os.Executable()
 	cwd, _ := os.Getwd()
@@ -28,4 +29,9 @@ func startNetworkServerAsRoot_win() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func cleanupYggdrasilSock(password string) string {
+	//dummy or todo
+	return ""
 }
