@@ -1,4 +1,4 @@
-module yggtest
+module yggdrasil-desktop-client
 
 go 1.15
 
@@ -16,5 +16,7 @@ require (
 	github.com/therecipe/qt/internal/binding/files/docs/5.13.0 v0.0.0-20200904063919-c0c124a5770d // indirect
 	github.com/yggdrasil-network/yggdrasil-extras v0.0.0-20200525205615-6c8a4a2e8855 // indirect
 	github.com/yggdrasil-network/yggdrasil-go v0.4.2
+	golang.org/x/sys v0.0.0-20210611083646-a4fc73990273
 	golang.org/x/text v0.3.7-0.20210503195748-5c7c50ebbd4f
+
 )

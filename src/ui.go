@@ -81,7 +81,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	app.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
 	time.Sleep(2 * time.Second)
-	checkNetworkServerRunningOrStart()
+	checkToStartNetworkServer()
 
 	window = widgets.NewQMainWindow(nil, 0)
 

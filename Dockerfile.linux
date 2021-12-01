@@ -1,0 +1,4 @@
+FROM therecipe/qt:linux_static as fcitx
+RUN echo "#!/bin/bash" >> /bin/buildlinux
+RUN echo "cd /src/ && $GOPATH/bin/qtdeploy build desktop" >> /bin/buildlinux
+RUN chmod +x /bin/buildlinux
