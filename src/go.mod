@@ -1,4 +1,4 @@
-module yggdrasil-desktop-client
+module github.com/threefoldtech/yggdrasil-desktop-client
 
 go 1.15
 
@@ -18,5 +18,5 @@ require (
 	github.com/yggdrasil-network/yggdrasil-go v0.4.2
 	golang.org/x/sys v0.0.0-20210611083646-a4fc73990273
 	golang.org/x/text v0.3.7-0.20210503195748-5c7c50ebbd4f
-
+	golang.zx2c4.com/wireguard v0.0.20200320 // indirect
 )

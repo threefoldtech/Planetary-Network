@@ -7,12 +7,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"flag"
-	"net"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"strings"
-
 
 	"golang.org/x/text/encoding/unicode"
 
