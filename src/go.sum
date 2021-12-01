@@ -248,6 +248,7 @@ golang.org/x/tools v0.0.0-20190606124116-d0a3d012864b h1:mSUCVIwDx4hfXJfWsOPfdzE
 golang.org/x/tools v0.0.0-20190606124116-d0a3d012864b/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.zx2c4.com/wireguard v0.0.0-20210510202332-9844c74f67ec/go.mod h1:a057zjmoc00UN7gVkaJt2sXVK523kMJcogDTEvPIasg=
+golang.zx2c4.com/wireguard v0.0.0-20210604143328-f9b48a961cd2 h1:wfOOSvHgIzTZ9h5Vb6yUFZNn7uf3bT7PeYsHOO7tYDM=
 golang.zx2c4.com/wireguard v0.0.0-20210604143328-f9b48a961cd2/go.mod h1:laHzsbfMhGSobUmruXWAyMKKHSqvIcrqZJMyHD+/3O8=
 golang.zx2c4.com/wireguard v0.0.20200122-0.20200214175355-9cbcff10dd3e/go.mod h1:P2HsVp8SKwZEufsnezXZA4GRX/T49/HlU7DGuelXsU4=
 golang.zx2c4.com/wireguard v0.0.20200320 h1:1vE6zVeO7fix9cJX1Z9ZQ+ikPIIx7vIyU0o0tLDD88g=

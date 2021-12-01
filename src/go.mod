@@ -17,5 +17,4 @@ require (
 	github.com/yggdrasil-network/yggdrasil-extras v0.0.0-20200525205615-6c8a4a2e8855 // indirect
 	github.com/yggdrasil-network/yggdrasil-go v0.4.2
 	golang.org/x/text v0.3.7-0.20210503195748-5c7c50ebbd4f
-	golang.zx2c4.com/wireguard v0.0.20200320 // indirect
 )
