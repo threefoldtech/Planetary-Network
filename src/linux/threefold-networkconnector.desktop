@@ -3,7 +3,7 @@
 Version=1.0
 Type=Application
 Terminal=false
-Exec=/usr/local/bin/yggdrasil-desktop-client
+Exec=/usr/local/bin/tf-network-connector-linux
 Name=Threefold Network Connector
 Comment=Threefold Network Connector
 Icon=/usr/share/icons/tf.ico

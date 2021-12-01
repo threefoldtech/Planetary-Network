@@ -1,8 +1,14 @@
 #!/bin/sh
 
-cd ..
+FILE=LICENSE
 
-FILE=src/deploy/linux/yggdrasil-desktop-client
+if [ ! -f "$FILE" ]; then
+    echo "Please run script from main directory"
+    exit 1
+fi
+
+
+FILE=src/deploy/linux/src
 
 if [ -f "$FILE" ]; then
     echo "$FILE exists."
@@ -14,7 +20,7 @@ if [ -f "$FILE" ]; then
     cp src/linux/postinst tf-network-connector-linux/DEBIAN
 
     mkdir -p tf-network-connector-linux/usr/local/bin
-    cp $FILE tf-network-connector-linux/usr/local/bin
+    cp $FILE tf-network-connector-linux/usr/local/bin/tf-network-connector-linux
     mkdir -p tf-network-connector-linux/usr/share/icons/
     cp src/qml/icon.ico tf-network-connector-linux/usr/share/icons/tf.ico
     mkdir -p  tf-network-connector-linux/usr/share/tf
