@@ -4,3 +4,6 @@ Threefold Network Connector is a desktop client (Windows, Mac OS X, Linux) to co
 
 ## More information
 See https://forum.threefold.io/t/how-our-planetary-network-works/1210
+
+## Download 
+See releases page: https://github.com/threefoldtech/TF-NetworkConnector/releases
