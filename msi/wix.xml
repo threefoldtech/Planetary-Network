@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+    Name="ThreeFoldNetworkConnector"
+    Id="*"
+    UpgradeCode="77757838-1a23-40a5-a720-c3b43e0260cc"
+    Language="1033"
+    Codepage="1252"
+    Version="0.0.0.1"
+    Manufacturer="github.com/threefoldtech">
+
+    <Package
+      Id="*"
+      Keywords="Installer"
+      Description="ThreeFoldNetworkConnector"
+      Comments="ThreeFoldNetworkConnector"
+      Manufacturer="github.com/threefoldtech"
+      InstallerVersion="200"
+      InstallScope="perMachine"
+      Languages="1033"
+      Compressed="yes"
+      SummaryCodepage="1252" />
+
+    <MajorUpgrade
+      AllowDowngrades="yes" />
+
+    <Media
+      Id="1"
+      Cabinet="Media.cab"
+      EmbedCab="yes"
+      CompressionLevel="high" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="ApplicationShortcutDesktop" Guid="c5119291-2aa3-4962-864a-9759c87beb63">
+            <Shortcut Id="ApplicationDesktopShortcut"
+                Name="ThreeFold Network Connector"
+                Description="Connects to the ThreeFold network."
+                Target="[ThreeFoldInstallFolder]ThreeFoldNetworkConnector.exe"
+                WorkingDirectory="ThreeFoldInstallFolder"/>
+            <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+            <RegistryValue
+                Root="HKCU"
+                Key="Software/ThreeFoldNetworkConnector"
+                Name="installed"
+                Type="integer"
+                Value="1"
+                KeyPath="yes"/>
+        </Component>
+      </Directory>
+
+
+      <Directory Id="ProgramFiles64Folder" Name="PFiles">
+        <Directory Id="ThreeFoldInstallFolder" Name="Threefold">
+
+          <Component Id="MainExecutable" Guid="c5119291-2aa3-4962-864a-9759c87beb64">
+            <File
+              Id="ThreeFoldNetworkConnector"
+              Name="ThreeFoldNetworkConnector.exe"
+              DiskId="1"
+              Source="ThreeFoldNetworkConnector.exe"
+              KeyPath="yes" />
+
+            <File
+              Id="Wintun"
+              Name="wintun.dll"
+              DiskId="1"
+              Source="wintun.dll" />
+          </Component>
+
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id="ThreeFoldFeature" Title="ThreeFoldNetworkConnector" Level="1">
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="ApplicationShortcutDesktop" />
+    </Feature>
+
+    <InstallExecuteSequence>
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>

@@ -11,3 +11,4 @@ tf-network-connector-linux
 *.deb
 yggdrasil-desktop-client
 generated
+wixbin
