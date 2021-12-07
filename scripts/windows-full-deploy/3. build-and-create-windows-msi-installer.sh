@@ -73,14 +73,14 @@ cat > wix.xml << EOF
       <Directory Id="DesktopFolder" Name="Desktop">
         <Component Id="ApplicationShortcutDesktop" Guid="c5119291-2aa3-4962-864a-9759c87beb63">
             <Shortcut Id="ApplicationDesktopShortcut"
-                Name="ThreeFold Network Connector"
-                Description="Connects to the ThreeFold network."
-                Target="[ThreeFoldInstallFolder]ThreeFoldNetworkConnector.exe"
+                Name="ThreeFold Planetary Network"
+                Description="Connects to the ThreeFold Planetary Network."
+                Target="[ThreeFoldInstallFolder]ThreeFoldPlanetaryNetwork.exe"
                 WorkingDirectory="ThreeFoldInstallFolder"/>
             <RemoveFolder Id="DesktopFolder" On="uninstall"/>
             <RegistryValue
                 Root="HKCU"
-                Key="Software/ThreeFoldNetworkConnector"
+                Key="Software/ThreeFoldPlanetaryNetwork"
                 Name="installed"
                 Type="integer"
                 Value="1"
@@ -94,10 +94,10 @@ cat > wix.xml << EOF
 
           <Component Id="MainExecutable" Guid="c5119291-2aa3-4962-864a-9759c87beb64">
             <File
-              Id="ThreeFoldNetworkConnector"
-              Name="ThreeFoldNetworkConnector.exe"
+              Id="ThreeFoldPlanetaryNetwork"
+              Name="ThreeFoldPlanetaryNetwork.exe"
               DiskId="1"
-              Source="ThreeFoldNetworkConnector.exe"
+              Source="ThreeFoldPlanetaryNetwork.exe"
               KeyPath="yes" />
 
             <File
@@ -111,7 +111,7 @@ cat > wix.xml << EOF
       </Directory>
     </Directory>
 
-    <Feature Id="ThreeFoldFeature" Title="ThreeFoldNetworkConnector" Level="1">
+    <Feature Id="ThreeFoldFeature" Title="ThreeFoldPlanetaryNetwork" Level="1">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="ApplicationShortcutDesktop" />
     </Feature>

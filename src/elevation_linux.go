@@ -22,8 +22,8 @@ func startNetworkServer() bool {
 	var password = ""
 	var widget = widgets.NewQWidget(nil, 0)
 	var dialog = widgets.NewQInputDialog(widget, core.Qt__Dialog)
-	dialog.SetWindowTitle("ThreeFold Network Connector")
-	dialog.SetLabelText("ThreeFold Network Connector would like to automatically\nset up your connection to the ThreeFold Network.\n\nTo do this, please provide the password for \"" + getUsername() + "\"")
+	dialog.SetWindowTitle("ThreeFold Planetary Network")
+	dialog.SetLabelText("ThreeFold Planetary Network would like to automatically\nset up your connection.\n\nTo do this, please provide the password for \"" + getUsername() + "\"")
 	dialog.SetTextEchoMode(widgets.QLineEdit__Password)
 	dialog.SetInputMethodHints(core.Qt__ImhNone)
 
