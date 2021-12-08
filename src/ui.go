@@ -346,7 +346,7 @@ func ListenToSysTrayTriggers() {
 	yggdrasilVersionMenuAction := systrayMenu.AddAction("Reset")
 	yggdrasilVersionMenuAction.ConnectTriggered(func(bool) {
 		http.Post("http://localhost:62853/reset", "application/json", bytes.NewBuffer(nil))
-		widgets.QMessageBox_Information(nil, "ThreeFold network connector", "All the settings have been reset.\n The application will close itself. \n\n You can simply open it again.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
+		widgets.QMessageBox_Information(nil, "ThreeFold Planetary Network", "All the settings have been reset.\n The application will close itself. \n\n You can simply open it again.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 		os.Exit(0)
 	})
 

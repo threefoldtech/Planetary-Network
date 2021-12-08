@@ -12,4 +12,6 @@ See releases page: https://github.com/threefoldtech/TF-NetworkConnector/releases
 
 The Planetary Network uses Yggdrasil Network inside.
 
-Each VM, and Zero-OS can integrate with this network.
+- scripts/macos-full-deploy/1.build.sh
+- ./scripts/icns-generator.sh ./resources/icon.ico
+- Manually insert the icns file into the DMG and update the plist.
