@@ -110,7 +110,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	yggdrasilVersionMenuAction := systrayMenu.AddAction("Reset")
 	yggdrasilVersionMenuAction.ConnectTriggered(func(bool) {
 		http.Post("http://localhost:62853/reset", "application/json", bytes.NewBuffer(nil))
-		widgets.QMessageBox_Information(nil, "ThreeFold network connector", "All the settings have been reset.\n The application will close itself. \n\n You can simply open it again.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
+		widgets.QMessageBox_Information(nil, "ThreeFold Planetary Network", "All the settings have been reset.\n The application will close itself. \n\n You can simply open it again.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 		os.Exit(0)
 	})
 
@@ -243,7 +243,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	widget.Layout().AddWidget(groupBox)
 
 	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
-		//widgets.QMessageBox_Information(nil, "ThreeFold network connector", "The ThreeFold network connector will be minimized.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
+		//widgets.QMessageBox_Information(nil, "ThreeFold Planetary Network", "The ThreeFold Planetary Network will be minimized.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 		window.Hide()
 		event.Ignore()
 	})

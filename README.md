@@ -38,4 +38,5 @@ Due to the complex building process of this project it is currently manual.
 ## Building DMG for macOS.
 
 - scripts/macos-full-deploy/1.build.sh
+- ./scripts/icns-generator.sh ./resources/icon.ico
 - Manually insert the icns file into the DMG and update the plist.
