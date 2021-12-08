@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product
-    Name="ThreeFoldNetworkConnector"
+    Name="ThreeFoldPlanetaryNetwork"
     Id="*"
     UpgradeCode="77757838-1a23-40a5-a720-c3b43e0260cc"
     Language="1033"
@@ -12,8 +12,8 @@
     <Package
       Id="*"
       Keywords="Installer"
-      Description="ThreeFoldNetworkConnector"
-      Comments="ThreeFoldNetworkConnector"
+      Description="ThreeFoldPlanetaryNetwork"
+      Comments="ThreeFoldPlanetaryNetwork"
       Manufacturer="github.com/threefoldtech"
       InstallerVersion="200"
       InstallScope="perMachine"
@@ -35,14 +35,14 @@
       <Directory Id="DesktopFolder" Name="Desktop">
         <Component Id="ApplicationShortcutDesktop" Guid="c5119291-2aa3-4962-864a-9759c87beb63">
             <Shortcut Id="ApplicationDesktopShortcut"
-                Name="ThreeFold Network Connector"
+                Name="ThreeFold Planetary Network"
                 Description="Connects to the ThreeFold network."
-                Target="[ThreeFoldInstallFolder]ThreeFoldNetworkConnector.exe"
+                Target="[ThreeFoldInstallFolder]ThreeFoldPlanetaryNetwork.exe"
                 WorkingDirectory="ThreeFoldInstallFolder"/>
             <RemoveFolder Id="DesktopFolder" On="uninstall"/>
             <RegistryValue
                 Root="HKCU"
-                Key="Software/ThreeFoldNetworkConnector"
+                Key="Software/ThreeFoldPlanetaryNetwork"
                 Name="installed"
                 Type="integer"
                 Value="1"
@@ -56,10 +56,10 @@
 
           <Component Id="MainExecutable" Guid="c5119291-2aa3-4962-864a-9759c87beb64">
             <File
-              Id="ThreeFoldNetworkConnector"
-              Name="ThreeFoldNetworkConnector.exe"
+              Id="ThreeFoldPlanetaryNetwork"
+              Name="ThreeFoldPlanetaryNetwork.exe"
               DiskId="1"
-              Source="ThreeFoldNetworkConnector.exe"
+              Source="ThreeFoldPlanetaryNetwork.exe"
               KeyPath="yes" />
 
             <File
@@ -73,7 +73,7 @@
       </Directory>
     </Directory>
 
-    <Feature Id="ThreeFoldFeature" Title="ThreeFoldNetworkConnector" Level="1">
+    <Feature Id="ThreeFoldFeature" Title="ThreeFoldPlanetaryNetwork" Level="1">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="ApplicationShortcutDesktop" />
     </Feature>

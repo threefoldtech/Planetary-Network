@@ -1,6 +1,6 @@
 # TF-NetworkConnector
 
-Threefold Network Connector is a desktop client (Windows, Mac OS X, Linux) to connect to the ThreeFold Planetary Network, or Yggdrasil Network. It's a GUI client to connect to the Planetary Network with one click.
+ThreeFold Planetary Network is a desktop client (Windows, macOS, Linux) to connect to the ThreeFold Planetary Network, or Yggdrasil Network. It's a GUI client to connect to the Planetary Network with one click.
 
 ## More information
 
