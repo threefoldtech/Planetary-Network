@@ -87,7 +87,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	window.SetMinimumSize2(600, 140)
 	window.SetFixedSize(core.NewQSize2(600, 140))
-	window.SetWindowTitle("ThreeFold network connector")
+	window.SetWindowTitle("ThreeFold Planetary Network")
 
 	widget := widgets.NewQWidget(nil, 0)
 	widget.SetLayout(widgets.NewQVBoxLayout())
@@ -98,7 +98,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	systrayMenu := widgets.NewQMenu(nil)
 
-	settingsMenuAction := systrayMenu.AddAction("Settings")
+	settingsMenuAction := systrayMenu.AddAction("Status")
 	settingsMenuAction.ConnectTriggered(func(bool) {
 		println("Showing window ...")
 		window.Show()
@@ -126,7 +126,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	systray.Show()
 
 	connectionState := false
-	groupBox := widgets.NewQGroupBox2("Settings", nil)
+	groupBox := widgets.NewQGroupBox2("Status", nil)
 
 	// println(window.Type())
 	gridLayout := widgets.NewQGridLayout2()
@@ -243,7 +243,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	widget.Layout().AddWidget(groupBox)
 
 	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
-		widgets.QMessageBox_Information(nil, "ThreeFold network connector", "The ThreeFold network connector will be minimized.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
+		//widgets.QMessageBox_Information(nil, "ThreeFold network connector", "The ThreeFold network connector will be minimized.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 		window.Hide()
 		event.Ignore()
 	})
