@@ -1,10 +1,10 @@
 ## Development Linux
 
 ### Build and install for Linux (Creating docker and make .deb file) 
-`./scripts/linux-full-deploy/1.build-deb.sh`
+`./scripts/linux-build.sh`
 
-### Navigate to source folder
-`cd src/deploy/linux/ `
+### Run the file
+`./src/deploy/linux/src`
 
-### Run the .deb file
-`./src`
+### When you have code changes:
+`docker exec ygglinux /bin/buildlinux`
