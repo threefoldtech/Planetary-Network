@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/therecipe/qt/core"
@@ -42,7 +41,6 @@ func startNetworkServer() bool {
 
 	fmt.Println("Starting server as root")
 	startNetworkServerAsRoot(password)
-	cleanupYggdrasilSock(password) //we just kill all yggdrasil sockets. If you already have ygg running it will be killed.
 
 	time.Sleep(2 * time.Second)
 	_, err2 := http.Get("http://localhost:62853/health")
@@ -50,18 +48,6 @@ func startNetworkServer() bool {
 		startNetworkServer()
 	}
 	return false
-}
-
-func cleanupYggdrasilSock(password string) string {
-
-	cmd := "echo " + password + " | sudo -S rm -rf /var/run/yggdrasil.sock"
-	// fmt.Println(cmd)
-	stdout, err := exec.Command("bash", "-c", cmd).Output()
-	if err != nil {
-		fmt.Println(err)
-		// os.Exit(1)
-	}
-	return strings.TrimSpace(string(stdout))
 }
 
 func startNetworkServerAsRoot(password string) {

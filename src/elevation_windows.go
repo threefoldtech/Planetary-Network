@@ -30,8 +30,3 @@ func startNetworkServerAsAdmin() {
 		fmt.Println(err)
 	}
 }
-
-func cleanupYggdrasilSock(password string) string {
-	//dummy or todo
-	return ""
-}

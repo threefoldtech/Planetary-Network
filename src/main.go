@@ -22,12 +22,13 @@ func main() {
 		startServer()
 
 	} else {
-
+		// This will cause the application to only have one instance. If the application is already running (eg listening on port 62854),
+		// the application will not start another instance.
 		http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 1
 		_, err := http.Get("http://localhost:62854/raise")
 
 		if err != nil { //only start if this is the single instance, in onther case the existing instance is raised
-			fmt.Println("Err on connect")
+			fmt.Println("Err on raise")
 
 			go startOneServer()
 

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/go-ping/ping"
-	"github.com/gocolly/colly/v2"
 	"github.com/yggdrasil-network/yggdrasil-go/src/config"
 	"github.com/yggdrasil-network/yggdrasil-go/src/defaults"
 )
@@ -18,6 +17,7 @@ import (
 var publicYggdrasilPeersURL = "https://publicpeers.neilalexander.dev/"
 
 var wg sync.WaitGroup
+var ipAddresses []YggdrasilIPAddress
 
 func fileExists(filename string) bool {
 	info, err := os.Stat(filename)
@@ -77,62 +77,27 @@ func getConfigPeers() <-chan string {
 	go func() {
 		defer close(r)
 
-		c := colly.NewCollector()
-		var ipAddresses []YggdrasilIPAddress
-
-		c.OnHTML(".statusgood #address", func(e *colly.HTMLElement) {
-			fmt.Print("Finding addresses")
-			// Filtering out all tcp and ipv6 addresses
-
-			if strings.Contains(e.Text, "tcp://") {
-				fmt.Print("Skip tcp")
-				return
-			}
-
-			if strings.Contains(e.Text, "[") && strings.Contains(e.Text, "]") {
-				fmt.Print("Skip ipv6")
-				return
-			}
-
-			// This also filters ipv6 incase we want it in the future.
-
-			result := strings.ReplaceAll(e.Text, "tls://", "")
-			result = strings.ReplaceAll(result, "tcp://", "")
-			result = strings.ReplaceAll(result, "[", "")
-			result = strings.ReplaceAll(result, "]", "")
-			splitResult := strings.Split(result, ":")
-			finalResult := strings.ReplaceAll(result, ":"+splitResult[len(splitResult)-1], "")
-			fmt.Print(finalResult)
-			ipAddr := YggdrasilIPAddress{
-				FullIPAddress: e.Text,
-				IPAddress:     finalResult,
-				latency:       9999,
-			}
-
-			ipAddresses = append(ipAddresses, ipAddr)
-		})
-
-		c.Visit(publicYggdrasilPeersURL)
+		ipAddresses = getPeers()
 
 		for index := 0; index < len(ipAddresses); index++ {
-			fmt.Print("found result")
 			wg.Add(1)
-			go pingAddress(ipAddresses[index])
+			go pingAddress(ipAddresses[index], index)
 		}
 
 		wg.Wait()
-		fmt.Print("wait done")
 		sort.Slice(ipAddresses, func(i, j int) bool {
 			return ipAddresses[i].latency < ipAddresses[j].latency
 		})
+
+		fmt.Println("RESULT")
+		fmt.Println(ipAddresses)
 
 		r <- fmt.Sprintf("\"Peers\": [\"%s\", \"%s\", \"%s\"]", ipAddresses[0].FullIPAddress, ipAddresses[1].FullIPAddress, ipAddresses[2].FullIPAddress)
 	}()
 
 	return r
 }
-func pingAddress(addr YggdrasilIPAddress) {
-	fmt.Println("pinging")
+func pingAddress(addr YggdrasilIPAddress, index int) {
 	pinger, err := ping.NewPinger(addr.IPAddress)
 	pinger.Timeout = time.Second / 2
 
@@ -149,10 +114,12 @@ func pingAddress(addr YggdrasilIPAddress) {
 	if stats.AvgRtt.String() == "0s" {
 		fmt.Println("0s so skipped")
 		addr.latency = 9999
+		ipAddresses[index] = addr
 		defer wg.Done()
 		return
 	}
-	fmt.Println("Found host", addr.FullIPAddress)
+
 	addr.latency, _ = strconv.ParseFloat(strings.ReplaceAll(stats.AvgRtt.String(), "ms", ""), 64)
 	defer wg.Done()
+	ipAddresses[index] = addr
 }
