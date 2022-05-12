@@ -5,6 +5,7 @@ type YggdrasilIPAddress struct {
 	IPAddress       string
 	latency         float64
 	isThreefoldNode bool
+	RealIP          string
 }
 
 type ConnectionInfo struct {

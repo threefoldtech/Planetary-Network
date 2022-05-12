@@ -81,7 +81,7 @@ func getConfigPeers() <-chan string {
 
 		for index := 0; index < len(ipAddresses); index++ {
 			wg.Add(1)
-			go pingAddress(ipAddresses[index], index)
+			go getAddressInfo(ipAddresses[index], index)
 		}
 
 		wg.Wait()
@@ -97,7 +97,36 @@ func getConfigPeers() <-chan string {
 
 	return r
 }
-func pingAddress(addr YggdrasilIPAddress, index int) {
+
+// Making this function async in some magic go-syntax land.
+func getPeerStats() <-chan []YggdrasilIPAddress {
+	fmt.Sprintf("Finding Peers ")
+	r := make(chan []YggdrasilIPAddress)
+
+	go func() {
+		defer close(r)
+
+		ipAddresses = getPeers()
+
+		for index := 0; index < len(ipAddresses); index++ {
+			wg.Add(1)
+			go getAddressInfo(ipAddresses[index], index)
+		}
+
+		wg.Wait()
+		sort.Slice(ipAddresses, func(i, j int) bool {
+			return ipAddresses[i].latency < ipAddresses[j].latency
+		})
+
+		r <- ipAddresses
+	}()
+
+	return r
+}
+
+func getAddressInfo(addr YggdrasilIPAddress, index int) {
+	defer wg.Done()
+
 	pinger, err := ping.NewPinger(addr.IPAddress)
 	pinger.Timeout = time.Second / 2
 
@@ -109,17 +138,21 @@ func pingAddress(addr YggdrasilIPAddress, index int) {
 	if err != nil {
 		// panic(err)
 	}
-	stats := pinger.Statistics() // get send/receive/rtt stats
+	stats := pinger.Statistics()
 
 	if stats.AvgRtt.String() == "0s" {
 		fmt.Println("0s so skipped")
 		addr.latency = 9999
 		ipAddresses[index] = addr
-		defer wg.Done()
 		return
 	}
 
+	addr.RealIP = stats.IPAddr.IP.String()
 	addr.latency, _ = strconv.ParseFloat(strings.ReplaceAll(stats.AvgRtt.String(), "ms", ""), 64)
-	defer wg.Done()
 	ipAddresses[index] = addr
+}
+
+func Testing() {
+	fmt.Println("Testing")
+	fmt.Println(ipAddresses)
 }

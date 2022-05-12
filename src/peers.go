@@ -35,8 +35,8 @@ func getPeers() []YggdrasilIPAddress {
 
 	for _, s := range arrayAddresses {
 		isThreefold := strings.HasPrefix(s, "tf-")
-		result := strings.ReplaceAll(s, "tf-", "")
-		result = strings.ReplaceAll(s, "tls://", "")
+		fullAdd := strings.ReplaceAll(s, "tf-", "")
+		result := strings.ReplaceAll(fullAdd, "tls://", "")
 		result = strings.ReplaceAll(result, "tcp://", "")
 		result = strings.ReplaceAll(result, "[", "")
 		result = strings.ReplaceAll(result, "]", "")
@@ -44,10 +44,11 @@ func getPeers() []YggdrasilIPAddress {
 		finalResult := strings.ReplaceAll(result, ":"+splitResult[len(splitResult)-1], "")
 
 		ip := YggdrasilIPAddress{
-			FullIPAddress:   s,
+			FullIPAddress:   fullAdd,
 			IPAddress:       finalResult,
 			latency:         9999,
 			isThreefoldNode: isThreefold,
+			RealIP:          finalResult,
 		}
 
 		ipAddresses = append(ipAddresses, ip)

@@ -27,6 +27,7 @@ var window *widgets.QMainWindow
 var peersLabel *widgets.QLabel
 var peersCountLabel *widgets.QLabel
 var peersList *widgets.QListWidget
+var testButton *widgets.QPushButton
 
 type QSystemTrayIconWithCustomSlot struct {
 	widgets.QSystemTrayIcon
@@ -161,18 +162,20 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	peersList := widgets.NewQListWidget(nil)
 	peersList.SetFixedHeight(200)
-	peersList.SetFixedWidth(200)
+	peersList.SetFixedWidth(350)
+	peersList.SetStyleSheet("QListWidget {padding: 10px;} QListWidget::item { margin: 10px; }")
 
 	connectionLabel = widgets.NewQLabel2("Disconnected", nil, 0)
 	connectionLabel.SetStyleSheet("QLabel {color: red;}")
 
 	connectButton = widgets.NewQPushButton2("Connect", nil)
+	testButton = widgets.NewQPushButton2("Test", nil)
 
 	CopyIPButton := widgets.NewQPushButton2("Copy Ipv6", nil)
 	copySubnetButton := widgets.NewQPushButton2("Copy Subnet", nil)
-	refreshPeerButton := widgets.NewQPushButton2("Show Peers", nil)
+	showPeerButton := widgets.NewQPushButton2("Show Peers", nil)
 
-	resetPeerButton := widgets.NewQPushButton2("Reset configs", nil)
+	resetPeerButton := widgets.NewQPushButton2("Search new peers", nil)
 
 	CopyIPButton.ConnectClicked(func(bool) {
 		app.Clipboard().SetText(ipLabel.Text(), gui.QClipboard__Clipboard)
@@ -182,8 +185,15 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 		app.Clipboard().SetText(subnetLabel.Text(), gui.QClipboard__Clipboard)
 	})
 
+	var listPeerData []YggdrasilIPAddress
+
 	resetPeerButton.ConnectClicked(func(bool) {
+		fmt.Println("Resetting configs ...")
 		peersList.Clear()
+		resetPeerButton.BlockSignals(true)
+		resetPeerButton.SetEnabled(false)
+		resetPeerButton.Repaint()
+
 		peersCountLabel.SetText("Count: 0")
 
 		connectButton.SetText("Connect")
@@ -228,30 +238,74 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 		peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
 
+		var peerData []YggdrasilIPAddress
+
+		if len(listPeerData) <= 0 {
+			peerData = <-getPeerStats()
+			listPeerData = peerData
+		} else {
+			peerData = listPeerData
+		}
+
 		for i, v := range info.ConnectionPeers {
+			isThreefoldNode := IsThreefoldNode(peerData, v)
+			fmt.Println(isThreefoldNode)
+
 			var item = widgets.NewQListWidgetItem2(v, peersList, i)
+
+			if isThreefoldNode {
+				item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+			}
+
 			peersList.AddItem2(item)
 		}
+
+		resetPeerButton.BlockSignals(false)
+		resetPeerButton.SetEnabled(true)
 	})
 
-	refreshPeerButton.ConnectClicked(func(bool) {
+	// testButton.ConnectPressed(func(event *gui.QKeyEvent) {
+
+	// testButton.ConnectClicked(func(bool) {
+	// 	fmt.Println("HOI")
+	// 	Testing()
+
+	// })
+
+	showPeerButton.ConnectClicked(func(bool) {
+		var peerData []YggdrasilIPAddress
+
+		if len(listPeerData) <= 0 {
+			peerData = <-getPeerStats()
+			listPeerData = peerData
+		} else {
+			peerData = listPeerData
+		}
+
 		peersList.Clear()
 
 		info := fetchConnectionData()
 
 		for i, v := range info.ConnectionPeers {
+			isThreefoldNode := IsThreefoldNode(peerData, v)
+			fmt.Println(isThreefoldNode)
+
 			var item = widgets.NewQListWidgetItem2(v, peersList, i)
+
+			if isThreefoldNode {
+				item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+			}
+
 			peersList.AddItem2(item)
 		}
 
 		secondWidget.SetWindowTitle("ThreeFold Planetary Network Peers")
-		secondWidget.SetFixedSize(core.NewQSize2(250, 250))
+		secondWidget.SetFixedSize(core.NewQSize2(400, 300))
 		secondWidget.Show()
 	})
 
 	connectButton.ConnectClicked(func(bool) {
 		if !connectionState {
-
 			ipLabel.SetText("...")
 			subnetLabel.SetText("...")
 
@@ -275,11 +329,6 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 			fmt.Println("RECEIVING INFO", info)
 
 			peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
-
-			for i, v := range info.ConnectionPeers {
-				var item = widgets.NewQListWidgetItem2(v, peersList, i)
-				peersList.AddItem2(item)
-			}
 
 			return
 		}
@@ -351,14 +400,14 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	gridLayout.AddWidget2(peersLabel, 4, 0, core.Qt__AlignLeft)
 	gridLayout.AddWidget2(peersCountLabel, 4, 1, core.Qt__AlignCenter)
-	gridLayout.AddWidget2(refreshPeerButton, 4, 2, core.Qt__AlignRight)
+	gridLayout.AddWidget2(showPeerButton, 4, 2, core.Qt__AlignRight)
 
 	gridLayoutSecondScreen.AddWidget2(peersList, 0, 0, core.Qt__AlignLeft)
 	gridLayoutSecondScreen.AddWidget2(resetPeerButton, 1, 0, core.Qt__AlignCenter)
 	// Debugging purposes
 
-	// gridLayout.AddWidget2(debugLabelInfo, 3, 0, core.Qt__AlignCenter)
-	// gridLayout.AddWidget2(debugLabel, 3, 1, core.Qt__AlignCenter)
+	// gridLayout.AddWidget2(testButton, 5, 0, core.Qt__AlignCenter)
+	// gridLayout.AddWidget2(debugLabel, 5, 1, core.Qt__AlignCenter)
 
 	groupBox.SetLayout(gridLayout)
 	groupBoxSecondScreen.SetLayout(gridLayoutSecondScreen)
