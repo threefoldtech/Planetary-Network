@@ -21,3 +21,8 @@ type ConnectionDetails struct {
 	ConnectionPeers []string
 	Error           string
 }
+
+type PeerSorting struct {
+	Peer            string
+	isThreefoldNode bool
+}

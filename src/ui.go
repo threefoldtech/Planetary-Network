@@ -247,13 +247,23 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 			peerData = listPeerData
 		}
 
-		for i, v := range info.ConnectionPeers {
+		customizedPeers := []PeerSorting{}
+		for _, v := range info.ConnectionPeers {
 			isThreefoldNode := IsThreefoldNode(peerData, v)
-			fmt.Println(isThreefoldNode)
+			customPeer := PeerSorting{
+				Peer:            v,
+				isThreefoldNode: isThreefoldNode,
+			}
 
-			var item = widgets.NewQListWidgetItem2(v, peersList, i)
+			customizedPeers = append(customizedPeers, customPeer)
+		}
 
-			if isThreefoldNode {
+		sortedPeers := SortBy("isThreefoldNode", customizedPeers)
+
+		for i, v := range sortedPeers {
+			var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
+
+			if v.isThreefoldNode {
 				item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
 			}
 
@@ -273,6 +283,10 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	// })
 
 	showPeerButton.ConnectClicked(func(bool) {
+		peersList.Clear()
+
+		info := fetchConnectionData()
+
 		var peerData []YggdrasilIPAddress
 
 		if len(listPeerData) <= 0 {
@@ -282,17 +296,23 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 			peerData = listPeerData
 		}
 
-		peersList.Clear()
-
-		info := fetchConnectionData()
-
-		for i, v := range info.ConnectionPeers {
+		customizedPeers := []PeerSorting{}
+		for _, v := range info.ConnectionPeers {
 			isThreefoldNode := IsThreefoldNode(peerData, v)
-			fmt.Println(isThreefoldNode)
+			customPeer := PeerSorting{
+				Peer:            v,
+				isThreefoldNode: isThreefoldNode,
+			}
 
-			var item = widgets.NewQListWidgetItem2(v, peersList, i)
+			customizedPeers = append(customizedPeers, customPeer)
+		}
 
-			if isThreefoldNode {
+		sortedPeers := SortBy("isThreefoldNode", customizedPeers)
+
+		for i, v := range sortedPeers {
+			var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
+
+			if v.isThreefoldNode {
 				item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
 			}
 
