@@ -283,6 +283,10 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	// })
 
 	showPeerButton.ConnectClicked(func(bool) {
+		resetPeerButton.BlockSignals(true)
+		resetPeerButton.SetEnabled(false)
+		resetPeerButton.Repaint()
+
 		peersList.Clear()
 
 		info := fetchConnectionData()
@@ -319,9 +323,14 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 			peersList.AddItem2(item)
 		}
 
+		resetPeerButton.BlockSignals(false)
+		resetPeerButton.SetEnabled(true)
+		resetPeerButton.Repaint()
+
 		secondWidget.SetWindowTitle("ThreeFold Planetary Network Peers")
 		secondWidget.SetFixedSize(core.NewQSize2(400, 300))
 		secondWidget.Show()
+
 	})
 
 	connectButton.ConnectClicked(func(bool) {
