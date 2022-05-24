@@ -158,11 +158,15 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	statusLabel := widgets.NewQLabel2("Connection status: ", nil, 0)
 	peersLabel := widgets.NewQLabel2("Peers: ", nil, 0)
-	peersCountLabel := widgets.NewQLabel2("Count: "+strconv.Itoa(peersCount), nil, 0)
+
+	peersCountLabel := widgets.NewQLabel2("No peers found", nil, 0)
+	if peersCount != 0 {
+		peersCountLabel.SetText("Count: " + strconv.Itoa(peersCount))
+	}
 
 	peersList := widgets.NewQListWidget(nil)
-	peersList.SetFixedHeight(200)
-	peersList.SetFixedWidth(350)
+	peersList.SetFixedHeight(300)
+	peersList.SetFixedWidth(450)
 	peersList.SetStyleSheet("QListWidget {padding: 10px;} QListWidget::item { margin: 10px; }")
 
 	connectionLabel = widgets.NewQLabel2("Disconnected", nil, 0)
@@ -177,6 +181,8 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 
 	resetPeerButton := widgets.NewQPushButton2("Search new peers", nil)
 
+	fillPeers()
+
 	CopyIPButton.ConnectClicked(func(bool) {
 		app.Clipboard().SetText(ipLabel.Text(), gui.QClipboard__Clipboard)
 	})
@@ -185,8 +191,6 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 		app.Clipboard().SetText(subnetLabel.Text(), gui.QClipboard__Clipboard)
 	})
 
-	var listPeerData []YggdrasilIPAddress
-
 	resetPeerButton.ConnectClicked(func(bool) {
 		fmt.Println("Resetting configs ...")
 		peersList.Clear()
@@ -194,7 +198,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 		resetPeerButton.SetEnabled(false)
 		resetPeerButton.Repaint()
 
-		peersCountLabel.SetText("Count: 0")
+		peersCountLabel.SetText("No peers found")
 
 		connectButton.SetText("Connect")
 		connectionLabel.SetText("Disconnected")
@@ -236,20 +240,18 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 		info := *fetchConnectionData()
 		fmt.Println("RECEIVING INFO", info)
 
-		peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
+		peersCountLabel.SetText("No peers found")
+		if len(info.ConnectionPeers) != 0 {
+			peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
+		}
 
-		var peerData []YggdrasilIPAddress
-
-		if len(listPeerData) <= 0 {
-			peerData = <-getPeerStats()
-			listPeerData = peerData
-		} else {
-			peerData = listPeerData
+		if len(ipAddresses) <= 0 {
+			ipAddresses = <-getPeerStats()
 		}
 
 		customizedPeers := []PeerSorting{}
 		for _, v := range info.ConnectionPeers {
-			isThreefoldNode := IsThreefoldNode(peerData, v)
+			isThreefoldNode := IsThreefoldNode(ipAddresses, v)
 			customPeer := PeerSorting{
 				Peer:            v,
 				isThreefoldNode: isThreefoldNode,
@@ -274,35 +276,22 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 		resetPeerButton.SetEnabled(true)
 	})
 
-	// testButton.ConnectPressed(func(event *gui.QKeyEvent) {
-
-	// testButton.ConnectClicked(func(bool) {
-	// 	fmt.Println("HOI")
-	// 	Testing()
-
-	// })
-
 	showPeerButton.ConnectClicked(func(bool) {
-		resetPeerButton.BlockSignals(true)
-		resetPeerButton.SetEnabled(false)
-		resetPeerButton.Repaint()
+		showPeerButton.BlockSignals(true)
+		showPeerButton.SetEnabled(false)
+		showPeerButton.Repaint()
 
 		peersList.Clear()
 
 		info := fetchConnectionData()
 
-		var peerData []YggdrasilIPAddress
-
-		if len(listPeerData) <= 0 {
-			peerData = <-getPeerStats()
-			listPeerData = peerData
-		} else {
-			peerData = listPeerData
+		if len(ipAddresses) <= 0 {
+			ipAddresses = <-getPeerStats()
 		}
 
 		customizedPeers := []PeerSorting{}
 		for _, v := range info.ConnectionPeers {
-			isThreefoldNode := IsThreefoldNode(peerData, v)
+			isThreefoldNode := IsThreefoldNode(ipAddresses, v)
 			customPeer := PeerSorting{
 				Peer:            v,
 				isThreefoldNode: isThreefoldNode,
@@ -323,12 +312,12 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 			peersList.AddItem2(item)
 		}
 
-		resetPeerButton.BlockSignals(false)
-		resetPeerButton.SetEnabled(true)
-		resetPeerButton.Repaint()
+		showPeerButton.BlockSignals(false)
+		showPeerButton.SetEnabled(true)
+		showPeerButton.Repaint()
 
 		secondWidget.SetWindowTitle("ThreeFold Planetary Network Peers")
-		secondWidget.SetFixedSize(core.NewQSize2(400, 300))
+		secondWidget.SetFixedSize(core.NewQSize2(500, 400))
 		secondWidget.Show()
 
 	})
@@ -357,7 +346,10 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 			info := *fetchConnectionData()
 			fmt.Println("RECEIVING INFO", info)
 
-			peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
+			peersCountLabel.SetText("No peers found")
+			if len(info.ConnectionPeers) != 0 {
+				peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
+			}
 
 			return
 		}
@@ -375,7 +367,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 		subnetLabel.SetText("N/A")
 
 		peersList.Clear()
-		peersCountLabel.SetText("Count: 0")
+		peersCountLabel.SetText("No peers found")
 
 		// Catch interrupts from the operating system to exit gracefully.
 		c := make(chan os.Signal, 1)

@@ -3,6 +3,7 @@ module github.com/threefoldtech/yggdrasil-desktop-client
 go 1.15
 
 require (
+	github.com/gin-gonic/gin v1.7.7 // indirect
 	github.com/go-ping/ping v0.0.0-20201115131931-3300c582a663
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/gologme/log v1.2.0
@@ -10,6 +11,7 @@ require (
 	github.com/hjson/hjson-go v3.1.0+incompatible
 	github.com/kardianos/minwinsvc v1.0.0
 	github.com/mitchellh/mapstructure v1.4.1
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/therecipe/qt v0.0.0-20200904063919-c0c124a5770d
 	github.com/therecipe/qt/internal/binding/files/docs/5.12.0 v0.0.0-20200904063919-c0c124a5770d // indirect
 	github.com/therecipe/qt/internal/binding/files/docs/5.13.0 v0.0.0-20200904063919-c0c124a5770d // indirect

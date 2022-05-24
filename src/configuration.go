@@ -118,10 +118,30 @@ func getPeerStats() <-chan []YggdrasilIPAddress {
 			return ipAddresses[i].latency < ipAddresses[j].latency
 		})
 
+		fmt.Println(r)
+
 		r <- ipAddresses
 	}()
 
 	return r
+}
+
+// Making this function async in some magic go-syntax land.
+func fillPeers() {
+	go func() {
+		ipAddresses = getPeers()
+
+		for index := 0; index < len(ipAddresses); index++ {
+			wg.Add(1)
+			go getAddressInfo(ipAddresses[index], index)
+		}
+
+		wg.Wait()
+		sort.Slice(ipAddresses, func(i, j int) bool {
+			return ipAddresses[i].latency < ipAddresses[j].latency
+		})
+
+	}()
 }
 
 func getAddressInfo(addr YggdrasilIPAddress, index int) {
@@ -150,9 +170,4 @@ func getAddressInfo(addr YggdrasilIPAddress, index int) {
 	addr.RealIP = stats.IPAddr.IP.String()
 	addr.latency, _ = strconv.ParseFloat(strings.ReplaceAll(stats.AvgRtt.String(), "ms", ""), 64)
 	ipAddresses[index] = addr
-}
-
-func Testing() {
-	fmt.Println("Testing")
-	fmt.Println(ipAddresses)
 }
