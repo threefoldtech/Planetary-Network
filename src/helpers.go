@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -58,6 +57,5 @@ func SortBy(jsonField string, arr []PeerSorting) []PeerSorting {
 		}
 	})
 
-	fmt.Printf("\nsort by %s:\n", jsonField)
 	return arr
 }

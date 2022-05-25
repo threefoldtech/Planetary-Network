@@ -8,9 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/signal"
 	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/therecipe/qt/core"
@@ -18,16 +16,33 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-var ipLabel *widgets.QLabel
-var subnetLabel *widgets.QLabel
-var debugLabel *widgets.QLabel
-var connectionLabel *widgets.QLabel
-var connectButton *widgets.QPushButton
+// Misc
+var connectionState bool
+
+// Windows
 var window *widgets.QMainWindow
-var peersLabel *widgets.QLabel
-var peersCountLabel *widgets.QLabel
+
+// Labels
+var connectionTitleLabel *widgets.QLabel
+var subnetTitleLabel *widgets.QLabel
+var ipTitleLabel *widgets.QLabel
+var peerTitleLabel *widgets.QLabel
+
+var connectionDataLabel *widgets.QLabel
+var ipDataLabel *widgets.QLabel
+var subnetDataLabel *widgets.QLabel
+var peersCountDataLabel *widgets.QLabel
+
+// Buttons
+var connectButton *widgets.QPushButton
+var ipButton *widgets.QPushButton
+var subnetButton *widgets.QPushButton
+var showPeersButton *widgets.QPushButton
+
+var resetPeerButton *widgets.QPushButton
+
+// Lists
 var peersList *widgets.QListWidget
-var testButton *widgets.QPushButton
 
 type QSystemTrayIconWithCustomSlot struct {
 	widgets.QSystemTrayIcon
@@ -37,30 +52,11 @@ type QSystemTrayIconWithCustomSlot struct {
 
 func (tray *QSystemTrayIconWithCustomSlot) triggerSlot(f func()) { f() } //the slot just needs to call the passed function to execute it inside the main thread
 
-func uiConnect() ConnectionInfo {
-	http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 10
-	resp, err := http.Post("http://localhost:62853/connect", "application/json", bytes.NewBuffer(nil))
-
-	if err != nil {
-		fmt.Println("Err on connect")
-		fmt.Println(err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	var connectionInfo = &ConnectionInfo{}
-	err = json.Unmarshal([]byte(body), connectionInfo)
-	fmt.Println("Connected, ip", connectionInfo.IpAddress)
-	return *connectionInfo
-}
-
-func uiDisconnect() {
-	http.Post("http://localhost:62853/disconnect", "application/json", bytes.NewBuffer(nil))
-}
-
-func deleteConfigOnClientSide() {
-	http.Post("http://localhost:62853/delete", "application/json", bytes.NewBuffer(nil))
+func SetDefaultTexts() {
+	connectionTitleLabel = widgets.NewQLabel2("Connection: ", nil, 0)
+	subnetTitleLabel = widgets.NewQLabel2("Subnet: ", nil, 0)
+	ipTitleLabel = widgets.NewQLabel2("IPv6: ", nil, 0)
+	peerTitleLabel = widgets.NewQLabel2("Peers: ", nil, 0)
 }
 
 func getCurrentConnectionInfo() ConnectionInfo {
@@ -80,24 +76,121 @@ func getCurrentConnectionInfo() ConnectionInfo {
 
 }
 func raiseWindow() {
-	println("Raising window ...")
 	window.Show()
-	// window.SetWindowFlags(core.Qt__WindowStaysOnTopHint)
 	window.ActivateWindow()
 	window.Raise()
 }
 
-func resetConnection() {
+func DisconnectToYggdrasil() {
+	DisconnectToServer()
+	DisconnectUserInterface()
+}
 
+func ConnectToYggdrasil() {
+	ConnectToServer()
+}
+
+func DisconnectUserInterface() {
+	// Remove state
+	connectionState = false
+
+	// Connection button
+	connectButton.SetText("Connect")
+
+	// Connection label
+	connectionDataLabel.SetText("Disconnected")
+	connectionDataLabel.SetStyleSheet("QLabel {color: red;}")
+
+	// Remove IP & Subnet
+	ipDataLabel.SetText("N/A")
+	subnetDataLabel.SetText("N/A")
+
+	// Clear peers
+	peersList.Clear()
+	peersCountDataLabel.SetText("No peers found")
+}
+
+func ConnectUserInterface(info ConnectionInfo) {
+	// Add state
+	connectionState = true
+
+	// Connection label
+	connectionDataLabel.SetText("Connected")
+	connectionDataLabel.SetStyleSheet("QLabel {color: green;}")
+
+	// Connection button
+	connectButton.SetText("Disconnect")
+
+	// IP & Subnet
+	ipDataLabel.SetText(info.IpAddress)
+	subnetDataLabel.SetText(info.SubnetAddress)
+
+	// Update window
+	connectButton.SetEnabled(true)
+	connectButton.Repaint()
+
+	// Updating peer text
+	peersCountDataLabel.SetText("Searching peers...")
+
+	// Fill peers
+	RetrievePeers()
+}
+
+func UpdateWindowPeers(details ConnectionDetails) {
+	resetPeerButton.BlockSignals(false)
+
+	if len(details.ConnectionPeers) == 0 {
+		peersCountDataLabel.SetText("No peers found")
+		return
+	}
+
+	peersCountDataLabel.SetText("Count: " + strconv.Itoa(len(details.ConnectionPeers)))
+
+	ShowPeersInUserInterface()
+}
+
+func SetWindowConnectedError(info ConnectionInfo) {
+	widgets.QMessageBox_Critical(nil, "Yggdrasil already running", " You already have an Yggdrasil client running. Can't connect.", widgets.QMessageBox__Ok, 0)
+}
+
+func ShowPeersInUserInterface() {
+	peersList.Clear()
+	info := fetchConnectionData()
+
+	if len(ipAddresses) <= 0 {
+		ipAddresses = <-getPeerStats()
+	}
+
+	customizedPeers := []PeerSorting{}
+	for _, v := range info.ConnectionPeers {
+		isThreefoldNode := IsThreefoldNode(ipAddresses, v)
+		customPeer := PeerSorting{
+			Peer:            v,
+			isThreefoldNode: isThreefoldNode,
+		}
+
+		customizedPeers = append(customizedPeers, customPeer)
+	}
+
+	sortedPeers := SortBy("isThreefoldNode", customizedPeers)
+
+	for i, v := range sortedPeers {
+		var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
+
+		if v.isThreefoldNode {
+			item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+		}
+
+		peersList.AddItem2(item)
+	}
 }
 
 func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
-
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	app.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
 	time.Sleep(2 * time.Second)
 	checkToStartNetworkServer()
-
+	SetDefaultTexts()
 	peersCount := 0
 
 	window = widgets.NewQMainWindow(nil, 0)
@@ -147,7 +240,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	systray.SetContextMenu(systrayMenu)
 	systray.Show()
 
-	connectionState := false
+	connectionState = false
 	groupBox := widgets.NewQGroupBox2("Status", nil)
 
 	groupBoxSecondScreen := widgets.NewQGroupBox2("Peers", nil)
@@ -157,164 +250,65 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	gridLayoutSecondScreen := widgets.NewQGridLayout2()
 
 	statusLabel := widgets.NewQLabel2("Connection status: ", nil, 0)
-	peersLabel := widgets.NewQLabel2("Peers: ", nil, 0)
 
-	peersCountLabel := widgets.NewQLabel2("No peers found", nil, 0)
+	peersCountDataLabel = widgets.NewQLabel2("No peers found", nil, 0)
 	if peersCount != 0 {
-		peersCountLabel.SetText("Count: " + strconv.Itoa(peersCount))
+		peersCountDataLabel.SetText("Count: " + strconv.Itoa(peersCount))
 	}
 
-	peersList := widgets.NewQListWidget(nil)
+	peersList = widgets.NewQListWidget(nil)
 	peersList.SetFixedHeight(300)
 	peersList.SetFixedWidth(450)
 	peersList.SetStyleSheet("QListWidget {padding: 10px;} QListWidget::item { margin: 10px; }")
 
-	connectionLabel = widgets.NewQLabel2("Disconnected", nil, 0)
-	connectionLabel.SetStyleSheet("QLabel {color: red;}")
+	connectionDataLabel = widgets.NewQLabel2("Disconnected", nil, 0)
+	connectionDataLabel.SetStyleSheet("QLabel {color: red;}")
 
 	connectButton = widgets.NewQPushButton2("Connect", nil)
-	testButton = widgets.NewQPushButton2("Test", nil)
 
-	CopyIPButton := widgets.NewQPushButton2("Copy Ipv6", nil)
-	copySubnetButton := widgets.NewQPushButton2("Copy Subnet", nil)
-	showPeerButton := widgets.NewQPushButton2("Show Peers", nil)
+	ipButton = widgets.NewQPushButton2("Copy Ipv6", nil)
+	subnetButton = widgets.NewQPushButton2("Copy Subnet", nil)
+	showPeersButton = widgets.NewQPushButton2("Show Peers", nil)
 
-	resetPeerButton := widgets.NewQPushButton2("Search new peers", nil)
+	resetPeerButton = widgets.NewQPushButton2("Search new peers", nil)
 
 	fillPeers()
 
-	CopyIPButton.ConnectClicked(func(bool) {
-		app.Clipboard().SetText(ipLabel.Text(), gui.QClipboard__Clipboard)
+	ipButton.ConnectClicked(func(bool) {
+		app.Clipboard().SetText(ipDataLabel.Text(), gui.QClipboard__Clipboard)
 	})
 
-	copySubnetButton.ConnectClicked(func(bool) {
-		app.Clipboard().SetText(subnetLabel.Text(), gui.QClipboard__Clipboard)
+	subnetButton.ConnectClicked(func(bool) {
+		app.Clipboard().SetText(subnetDataLabel.Text(), gui.QClipboard__Clipboard)
 	})
 
 	resetPeerButton.ConnectClicked(func(bool) {
-		fmt.Println("Resetting configs ...")
-		peersList.Clear()
+		fmt.Println("INCOMING")
 		resetPeerButton.BlockSignals(true)
 		resetPeerButton.SetEnabled(false)
 		resetPeerButton.Repaint()
 
-		peersCountLabel.SetText("No peers found")
+		DeleteConfigOnFileSystem()
 
-		connectButton.SetText("Connect")
-		connectionLabel.SetText("Disconnected")
-		connectionLabel.SetStyleSheet("QLabel {color: red;}")
-
-		deleteConfigOnClientSide()
 		if connectionState == true {
-			uiDisconnect()
-			connectionState = false
-
-			ipLabel.SetText("N/A")
-			subnetLabel.SetText("N/A")
-
-			c := make(chan os.Signal, 1)
-			r := make(chan os.Signal, 1)
-
-			signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-			signal.Notify(r, os.Interrupt, syscall.SIGHUP)
-
+			DisconnectToYggdrasil()
 		}
 
-		connInfo := uiConnect()
-		if connInfo.Error != "" {
-			widgets.QMessageBox_Critical(nil, "Yggdrasil already running", " You already have an Yggdrasil client running. Can't connect.", widgets.QMessageBox__Ok, 0)
-			return
-		}
+		ConnectToYggdrasil()
 
-		connectButton.SetText("Disconnect")
-		ipLabel.SetText(connInfo.IpAddress)
-		subnetLabel.SetText(connInfo.SubnetAddress)
-
-		connectionState = true
-		connectionLabel.SetText("Connected")
-		connectionLabel.SetStyleSheet("QLabel {color: green;}")
-
-		// Default time sleep is needed otherwise peers are not initialized yet
-		time.Sleep(time.Second)
-
-		info := *fetchConnectionData()
-		fmt.Println("RECEIVING INFO", info)
-
-		peersCountLabel.SetText("No peers found")
-		if len(info.ConnectionPeers) != 0 {
-			peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
-		}
-
-		if len(ipAddresses) <= 0 {
-			ipAddresses = <-getPeerStats()
-		}
-
-		customizedPeers := []PeerSorting{}
-		for _, v := range info.ConnectionPeers {
-			isThreefoldNode := IsThreefoldNode(ipAddresses, v)
-			customPeer := PeerSorting{
-				Peer:            v,
-				isThreefoldNode: isThreefoldNode,
-			}
-
-			customizedPeers = append(customizedPeers, customPeer)
-		}
-
-		sortedPeers := SortBy("isThreefoldNode", customizedPeers)
-
-		for i, v := range sortedPeers {
-			var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
-
-			if v.isThreefoldNode {
-				item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
-			}
-
-			peersList.AddItem2(item)
-		}
-
-		resetPeerButton.BlockSignals(false)
 		resetPeerButton.SetEnabled(true)
+		resetPeerButton.Repaint()
 	})
 
-	showPeerButton.ConnectClicked(func(bool) {
-		showPeerButton.BlockSignals(true)
-		showPeerButton.SetEnabled(false)
-		showPeerButton.Repaint()
+	showPeersButton.ConnectClicked(func(bool) {
+		showPeersButton.SetEnabled(false)
+		showPeersButton.Repaint()
 
 		peersList.Clear()
+		ShowPeersInUserInterface()
 
-		info := fetchConnectionData()
-
-		if len(ipAddresses) <= 0 {
-			ipAddresses = <-getPeerStats()
-		}
-
-		customizedPeers := []PeerSorting{}
-		for _, v := range info.ConnectionPeers {
-			isThreefoldNode := IsThreefoldNode(ipAddresses, v)
-			customPeer := PeerSorting{
-				Peer:            v,
-				isThreefoldNode: isThreefoldNode,
-			}
-
-			customizedPeers = append(customizedPeers, customPeer)
-		}
-
-		sortedPeers := SortBy("isThreefoldNode", customizedPeers)
-
-		for i, v := range sortedPeers {
-			var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
-
-			if v.isThreefoldNode {
-				item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
-			}
-
-			peersList.AddItem2(item)
-		}
-
-		showPeerButton.BlockSignals(false)
-		showPeerButton.SetEnabled(true)
-		showPeerButton.Repaint()
+		showPeersButton.SetEnabled(true)
+		showPeersButton.Repaint()
 
 		secondWidget.SetWindowTitle("ThreeFold Planetary Network Peers")
 		secondWidget.SetFixedSize(core.NewQSize2(500, 400))
@@ -323,75 +317,26 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	})
 
 	connectButton.ConnectClicked(func(bool) {
-		if !connectionState {
-			ipLabel.SetText("...")
-			subnetLabel.SetText("...")
+		connectButton.SetEnabled(false)
+		connectButton.Repaint()
 
-			connInfo := uiConnect()
-			if connInfo.Error != "" {
-				widgets.QMessageBox_Critical(nil, "Yggdrasil already running", " You already have an Yggdrasil client running. Can't connect.", widgets.QMessageBox__Ok, 0)
-				return
-			}
-			connectButton.SetText("Disconnect")
-			ipLabel.SetText(connInfo.IpAddress)
-			subnetLabel.SetText(connInfo.SubnetAddress)
-
-			connectionState = true
-			connectionLabel.SetText("Connected")
-			connectionLabel.SetStyleSheet("QLabel {color: green;}")
-
-			// Default time sleep is needed otherwise peers are not initialized yet
-			time.Sleep(time.Second)
-
-			info := *fetchConnectionData()
-			fmt.Println("RECEIVING INFO", info)
-
-			peersCountLabel.SetText("No peers found")
-			if len(info.ConnectionPeers) != 0 {
-				peersCountLabel.SetText("Count: " + strconv.Itoa(len(info.ConnectionPeers)))
-			}
-
+		if connectionState == false {
+			ConnectToYggdrasil()
 			return
 		}
-		uiDisconnect()
-		connectButton.SetText("Connect")
-		connectionLabel.SetText("Disconnected")
-		connectionLabel.SetStyleSheet("QLabel {color: red;}")
 
-		connectionState = false
-		// defer n.shutdown()
-		// go submain()
-		// widgets.QMessageBox_Information(nil, "OK", "Connecting ...", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
+		DisconnectToYggdrasil()
 
-		ipLabel.SetText("N/A")
-		subnetLabel.SetText("N/A")
-
-		peersList.Clear()
-		peersCountLabel.SetText("No peers found")
-
-		// Catch interrupts from the operating system to exit gracefully.
-		c := make(chan os.Signal, 1)
-		r := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-		signal.Notify(r, os.Interrupt, syscall.SIGHUP)
-		// Capture the service being stopped on Windows.
-		// minwinsvc.SetOnExit(n.shutdown)
-		// defer n.shutdown()
-		// Wait for the terminate/interrupt signal. Once a signal is received, the
-		// deferred Stop function above will run which will shut down TUN/TAP.
+		connectButton.SetEnabled(true)
+		connectButton.Repaint()
 	})
 
 	gridLayout.AddWidget2(statusLabel, 0, 0, core.Qt__AlignLeft)
-	gridLayout.AddWidget2(connectionLabel, 0, 1, core.Qt__AlignCenter)
+	gridLayout.AddWidget2(connectionDataLabel, 0, 1, core.Qt__AlignCenter)
 	gridLayout.AddWidget2(connectButton, 0, 2, core.Qt__AlignRight)
 
-	ipLabelInfo := widgets.NewQLabel2("Ipv6: ", nil, 0)
-	subnetLabelInfo := widgets.NewQLabel2("Subnet: ", nil, 0)
-	//	debugLabelInfo := widgets.NewQLabel2("Debug: ", nil, 0)
-
-	ipLabel = widgets.NewQLabel2("N/A", nil, 0)
-	subnetLabel = widgets.NewQLabel2("N/A", nil, 0)
-	//	debugLabel = widgets.NewQLabel2("Debug info", nil, 0)
+	ipDataLabel = widgets.NewQLabel2("N/A", nil, 0)
+	subnetDataLabel = widgets.NewQLabel2("N/A", nil, 0)
 
 	println("Checking current connection")
 	connInfo := getCurrentConnectionInfo()
@@ -400,35 +345,31 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	if connInfo.IpAddress != "" {
 
 		connectButton.SetText("Disconnect")
-		ipLabel.SetText(connInfo.IpAddress)
-		subnetLabel.SetText(connInfo.SubnetAddress)
+		ipDataLabel.SetText(connInfo.IpAddress)
+		subnetDataLabel.SetText(connInfo.SubnetAddress)
 
 		connectionState = true
-		connectionLabel.SetText("Connected")
-		connectionLabel.SetStyleSheet("QLabel {color: green;}")
+		connectionDataLabel.SetText("Connected")
+		connectionDataLabel.SetStyleSheet("QLabel {color: green;}")
 
-		ipLabel.SetText(connInfo.IpAddress)
-		subnetLabel.SetText(connInfo.SubnetAddress)
+		ipDataLabel.SetText(connInfo.IpAddress)
+		subnetDataLabel.SetText(connInfo.SubnetAddress)
 	}
 
-	gridLayout.AddWidget2(ipLabelInfo, 2, 0, core.Qt__AlignLeft)
-	gridLayout.AddWidget2(ipLabel, 2, 1, core.Qt__AlignCenter)
-	gridLayout.AddWidget2(CopyIPButton, 2, 2, core.Qt__AlignRight)
+	gridLayout.AddWidget2(ipTitleLabel, 2, 0, core.Qt__AlignLeft)
+	gridLayout.AddWidget2(ipDataLabel, 2, 1, core.Qt__AlignCenter)
+	gridLayout.AddWidget2(ipButton, 2, 2, core.Qt__AlignRight)
 
-	gridLayout.AddWidget2(subnetLabelInfo, 3, 0, core.Qt__AlignLeft)
-	gridLayout.AddWidget2(subnetLabel, 3, 1, core.Qt__AlignCenter)
-	gridLayout.AddWidget2(copySubnetButton, 3, 2, core.Qt__AlignRight)
+	gridLayout.AddWidget2(subnetTitleLabel, 3, 0, core.Qt__AlignLeft)
+	gridLayout.AddWidget2(subnetDataLabel, 3, 1, core.Qt__AlignCenter)
+	gridLayout.AddWidget2(subnetButton, 3, 2, core.Qt__AlignRight)
 
-	gridLayout.AddWidget2(peersLabel, 4, 0, core.Qt__AlignLeft)
-	gridLayout.AddWidget2(peersCountLabel, 4, 1, core.Qt__AlignCenter)
-	gridLayout.AddWidget2(showPeerButton, 4, 2, core.Qt__AlignRight)
+	gridLayout.AddWidget2(peerTitleLabel, 4, 0, core.Qt__AlignLeft)
+	gridLayout.AddWidget2(peersCountDataLabel, 4, 1, core.Qt__AlignCenter)
+	gridLayout.AddWidget2(showPeersButton, 4, 2, core.Qt__AlignRight)
 
 	gridLayoutSecondScreen.AddWidget2(peersList, 0, 0, core.Qt__AlignLeft)
 	gridLayoutSecondScreen.AddWidget2(resetPeerButton, 1, 0, core.Qt__AlignCenter)
-	// Debugging purposes
-
-	// gridLayout.AddWidget2(testButton, 5, 0, core.Qt__AlignCenter)
-	// gridLayout.AddWidget2(debugLabel, 5, 1, core.Qt__AlignCenter)
 
 	groupBox.SetLayout(gridLayout)
 	groupBoxSecondScreen.SetLayout(gridLayoutSecondScreen)
@@ -437,7 +378,6 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	secondWidget.Layout().AddWidget(groupBoxSecondScreen)
 
 	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
-		//widgets.QMessageBox_Information(nil, "ThreeFold network connector", "The ThreeFold network connector will be minimized.", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 		window.Hide()
 		event.Ignore()
 	})

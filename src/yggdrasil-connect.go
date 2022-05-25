@@ -44,13 +44,10 @@ func cleanupYggdrasilSock() string {
 		// os.Exit(1)
 	}
 
-	fmt.Println("COMING HERE 2")
 	return strings.TrimSpace(string(stdout))
 }
 
 func yggdrasilConnect() ConnectionInfo {
-
-	// defer close(done)
 	cleanupYggdrasilSock()
 	if _, err := os.Stat("/var/run/yggdrasil.sock"); err == nil {
 		connInfo := ConnectionInfo{
@@ -63,8 +60,6 @@ func yggdrasilConnect() ConnectionInfo {
 		return connInfo
 
 	}
-
-	fmt.Println("COMING HERE 3")
 
 	var logger *log.Logger
 
@@ -162,6 +157,7 @@ func yggdrasilConnect() ConnectionInfo {
 }
 
 func resetApplication() {
+	cleanupYggdrasilSock()
 	err := os.Remove("/var/run/yggdrasil.sock")
 
 	if err != nil {
