@@ -89,10 +89,18 @@ func getConfigPeers() <-chan string {
 			return ipAddresses[i].latency < ipAddresses[j].latency
 		})
 
-		fmt.Println("RESULT")
-		fmt.Println(ipAddresses)
+		var threefoldNodes []YggdrasilIPAddress
+		var publicNodes []YggdrasilIPAddress
 
-		r <- fmt.Sprintf("\"Peers\": [\"%s\", \"%s\", \"%s\"]", ipAddresses[0].FullIPAddress, ipAddresses[1].FullIPAddress, ipAddresses[2].FullIPAddress)
+		for _, s := range ipAddresses {
+			if s.isThreefoldNode {
+				threefoldNodes = append(threefoldNodes, s)
+			} else {
+				publicNodes = append(publicNodes, s)
+			}
+		}
+
+		r <- fmt.Sprintf("\"Peers\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"]", threefoldNodes[0].FullIPAddress, threefoldNodes[1].FullIPAddress, threefoldNodes[2].FullIPAddress, threefoldNodes[3].FullIPAddress, threefoldNodes[4].FullIPAddress, publicNodes[5].FullIPAddress, publicNodes[6].FullIPAddress, publicNodes[7].FullIPAddress, publicNodes[8].FullIPAddress, publicNodes[9].FullIPAddress)
 	}()
 
 	return r
