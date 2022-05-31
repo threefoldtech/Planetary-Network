@@ -1,3 +1,5 @@
+# Deploy
+
 ## Building MSI for windows.
 Due to the complex building process of this project it is currently manual. 
 
@@ -24,3 +26,8 @@ Due to the complex building process of this project it is currently manual.
 - cd inside the `generated/builds/windows` directory and run the following commands:
 - wixbin/candle -nologo -out ThreeFoldNetworkConnector-0.0.0.1-x64.wixobj -arch x64 wix.xml
 - wixbin/light -nologo -spdb -sice:ICE71 -sice:ICE61 -ext WixUtilExtension.dll -out ThreeFoldNetworkConnector-0.0.0.1-x64.msi ThreeFoldNetworkConnector-0.0.0.1-x64.wixobj
+
+
+# Dev
+
+## TODO
