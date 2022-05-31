@@ -199,9 +199,11 @@ func ShowPeersInUserInterface() {
 	for i, v := range sortedPeers {
 		var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
 
-		if v.isThreefoldNode {
-			item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
-		}
+		// if v.isThreefoldNode {
+		// 	item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+		// }
+
+		item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
 
 		peersList.AddItem2(item)
 	}
@@ -402,7 +404,7 @@ func ListenToButtonClicks() {
 		showPeersButton.SetEnabled(true)
 		showPeersButton.Repaint()
 
-		peersWindow.SetWindowTitle("ThreeFold Planetary Network Peers")
+		peersWindow.SetWindowTitle("ThreeFold Planetary Network Peers 222")
 		peersWindow.SetFixedSize(core.NewQSize2(500, 400))
 		peersWindow.Show()
 

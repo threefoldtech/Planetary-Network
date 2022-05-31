@@ -5,7 +5,7 @@ if [ ! -f "$FILE" ]; then
     echo "Please run script from main directory"
     exit 1
 fi
-sudo chown -R $USER src
+# sudo chown -R $USER src
 cp src/go.mod.back src/go.mod
 
 
