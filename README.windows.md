@@ -31,3 +31,24 @@ Due to the complex building process of this project it is currently manual.
 # Dev
 
 ## TODO
+
+
+
+
+
+
+
+https://jmeubank.github.io/tdm-gcc/articles/2021-05/10.3.0-release
+
+
+
+Install QT 5.13.0
+Install Go 1.18
+Install MinGW
+Install GCC
+
+QT_DIR=C:\Qt\Qt5.13.0
+QT_QMAKE_DIR=C:\Qt\Qt5.13.0\5.13.0\mingw73_64\bin
+
+
+qtdeploy build desktop ./ (in src folder)

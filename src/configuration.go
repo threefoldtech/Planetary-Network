@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -156,6 +157,11 @@ func getAddressInfo(addr YggdrasilIPAddress, index int) {
 	defer wg.Done()
 
 	pinger, err := ping.NewPinger(addr.IPAddress)
+
+	if runtime.GOOS == "windows" {
+		pinger.SetPrivileged(true)
+	}
+
 	pinger.Timeout = time.Second / 2
 
 	if err != nil {
@@ -168,6 +174,7 @@ func getAddressInfo(addr YggdrasilIPAddress, index int) {
 	}
 	stats := pinger.Statistics()
 
+	fmt.Println(stats)
 	if stats.AvgRtt.String() == "0s" {
 		fmt.Println("0s so skipped")
 		addr.latency = 9999
@@ -177,5 +184,7 @@ func getAddressInfo(addr YggdrasilIPAddress, index int) {
 
 	addr.RealIP = stats.IPAddr.IP.String()
 	addr.latency, _ = strconv.ParseFloat(strings.ReplaceAll(stats.AvgRtt.String(), "ms", ""), 64)
+
+	fmt.Println(addr)
 	ipAddresses[index] = addr
 }

@@ -199,11 +199,11 @@ func ShowPeersInUserInterface() {
 	for i, v := range sortedPeers {
 		var item = widgets.NewQListWidgetItem2(v.Peer, peersList, i)
 
-		// if v.isThreefoldNode {
-		// 	item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
-		// }
+		if v.isThreefoldNode {
+			item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+		}
 
-		item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+		// item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
 
 		peersList.AddItem2(item)
 	}
