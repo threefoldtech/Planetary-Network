@@ -203,8 +203,6 @@ func ShowPeersInUserInterface() {
 			item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
 		}
 
-		// item.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
-
 		peersList.AddItem2(item)
 	}
 }
