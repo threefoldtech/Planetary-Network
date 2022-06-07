@@ -1,26 +1,26 @@
-# Deploy
+## Deploy
 
-## Building MSI for windows.
+### Building MSI for windows.
 Due to the complex building process of this project it is currently manual. 
 
-### Step 1 (From a Linux machine or using Windows WSL.)
+#### Step 1 (From a Linux machine or using Windows WSL.)
 - ./scripts/windows-full-deploy/1.build-and-prepare-windows-binary.sh
 
-### Step 2: Add requird files
+#### Step 2: Add requird files
 - Copy the .exe file to generated/builds/windows
 - cp libs/wintun.dll generated/builds/windows/wintun.dll
 - cp resources/icon.ico generated/builds/windows/icon.ico
 
-### Step 3 (From cmd or powershell using Windows. Might work with wine, untested.) Note: ResourceHacker must be installed!
+#### Step 3 (From cmd or powershell using Windows. Might work with wine, untested.) Note: ResourceHacker must be installed!
 - Make sure the path inside the bat script is correct
 - ./scripts/windows-full-deploy/2.build-and-prepare-windows-binary-icon.bat
 
-### Step 4 other option. (From cmd or powershell using Windows. Might work with wine, untested.) Note: Can't be done inside WSL must be on a native windows PATH. UNC paths not supported.
+#### Step 4 other option. (From cmd or powershell using Windows. Might work with wine, untested.) Note: Can't be done inside WSL must be on a native windows PATH. UNC paths not supported.
 - Extract the contents from `https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip` into a folder `wixbin` and copy it into the root of this project.
 - scripts\windows-full-deploy\3.build-and-create-windows-msi-installer.bat
 
 
-### Step 4 (From cmd or powershell using Windows. Might work with wine, untested.) Note: Can't be done inside WSL must be on a native windows PATH. UNC paths not supported.
+#### Step 4 (From cmd or powershell using Windows. Might work with wine, untested.) Note: Can't be done inside WSL must be on a native windows PATH. UNC paths not supported.
 - Copy the `wix.xml` file from the msi directory into `generated/builds/windows/`.
 - Extract the contents from `https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip` into a folder `wixbin` and copy it into `generated/builds/windows/`.
 - cd inside the `generated/builds/windows` directory and run the following commands:
@@ -28,30 +28,36 @@ Due to the complex building process of this project it is currently manual.
 - wixbin/light -nologo -spdb -sice:ICE71 -sice:ICE61 -ext WixUtilExtension.dll -out ThreeFoldNetworkConnector-0.0.0.1-x64.msi ThreeFoldNetworkConnector-0.0.0.1-x64.wixobj
 
 
-# Dev
+## Dev
 
-## TODO
+### Developing native for Windows
 
-
-
-Install QT 5.13.0
+#### Step 1: install QT 5.13.0 Open Source Native
 https://download.qt.io/archive/qt/5.13/5.13.0/
 
-(Make sure to install MinGW 7.3 64bit)
+** (Make sure to install MinGW 7.3 64bit) **
 
-Install Go 1.18
+
+#### Step 2: install Golang
 https://go.dev/dl/
 
 
-Install GCC
+#### Step 3: install GCC for C++ compilation
 msys2.org
 
-Set right env variables
+#### Step 4: make sure all env vars are correctly configured
+
+```sh
 QT_DIR=C:\Qt\Qt5.13.0
 QT_QMAKE_DIR=C:\Qt\Qt5.13.0\5.13.0\mingw73_64\bin
+```
 
-Create exe file
-qtdeploy build desktop ./ (in src folder)
+#### Step 5: create .exe file (make sure you are in src folder)
 
-Helpfull article:
+```sh
+qtdeploy build desktop ./ 
+```
+
+
+#### Helpfull article:
 https://jmeubank.github.io/tdm-gcc/articles/2021-05/10.3.0-release

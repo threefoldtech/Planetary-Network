@@ -66,7 +66,7 @@ func ConnectToServer() {
 	go func() {
 		connectionChannel := make(chan *http.Response)
 
-		http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 10
+		http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 15
 		go SendPostAsync("http://localhost:62853/connect", connectionChannel)
 
 		connectionResponse := <-connectionChannel

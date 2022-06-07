@@ -16,6 +16,8 @@ func main() {
 
 	InitializeEvents()
 
+	fillPeers()
+
 	server := flag.Bool("server", false, "Yggdrasil root server")
 	flag.Parse()
 
