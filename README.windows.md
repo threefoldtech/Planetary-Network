@@ -34,21 +34,24 @@ Due to the complex building process of this project it is currently manual.
 
 
 
-
-
-
-
-https://jmeubank.github.io/tdm-gcc/articles/2021-05/10.3.0-release
-
-
-
 Install QT 5.13.0
-Install Go 1.18
-Install MinGW
-Install GCC
+https://download.qt.io/archive/qt/5.13/5.13.0/
 
+(Make sure to install MinGW 7.3 64bit)
+
+Install Go 1.18
+https://go.dev/dl/
+
+
+Install GCC
+msys2.org
+
+Set right env variables
 QT_DIR=C:\Qt\Qt5.13.0
 QT_QMAKE_DIR=C:\Qt\Qt5.13.0\5.13.0\mingw73_64\bin
 
-
+Create exe file
 qtdeploy build desktop ./ (in src folder)
+
+Helpfull article:
+https://jmeubank.github.io/tdm-gcc/articles/2021-05/10.3.0-release

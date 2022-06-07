@@ -5,9 +5,13 @@ echo "Cleaning old build artifacts"
 rm -rf src/deploy/darwin & rm -rf "ThreeFold Planetary Network.dmg"
 
 echo "Building the binary"
-GO111MODULE=off 
-qtmoc desktop src/.
-qtdeploy build darwin src/.
+ 
+cd src
+
+qtmoc desktop ./
+qtdeploy build darwin ./
+
+cd ..
 
 echo "Renaming and adding reference to /Application directory path."
 mv "src/deploy/darwin/src.app" "src/deploy/darwin/ThreeFold Planetary Network.app"

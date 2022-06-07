@@ -404,7 +404,7 @@ func ListenToButtonClicks() {
 		showPeersButton.SetEnabled(true)
 		showPeersButton.Repaint()
 
-		peersWindow.SetWindowTitle("ThreeFold Planetary Network Peers 222")
+		peersWindow.SetWindowTitle("ThreeFold Planetary Network Peers")
 		peersWindow.SetFixedSize(core.NewQSize2(500, 400))
 		peersWindow.Show()
 

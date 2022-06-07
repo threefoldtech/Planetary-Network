@@ -10,7 +10,7 @@ import (
 )
 
 func getPeers() []YggdrasilIPAddress {
-	resp, err := http.Get("https://raw.githubusercontent.com/threefoldtech/planetary_network/feature/config-rework/nodelist")
+	resp, err := http.Get("https://raw.githubusercontent.com/threefoldtech/planetary_network/main/nodelist")
 	if err != nil || resp.StatusCode != 200 {
 		fmt.Println("Error to fetch peers")
 		fmt.Println("StatusCode: ", resp.StatusCode)
