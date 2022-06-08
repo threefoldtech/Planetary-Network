@@ -24,8 +24,8 @@ Due to the complex building process of this project it is currently manual.
 - Copy the `wix.xml` file from the msi directory into `generated/builds/windows/`.
 - Extract the contents from `https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip` into a folder `wixbin` and copy it into `generated/builds/windows/`.
 - cd inside the `generated/builds/windows` directory and run the following commands:
-- wixbin/candle -nologo -out ThreeFoldNetworkConnector-0.0.0.1-x64.wixobj -arch x64 wix.xml
-- wixbin/light -nologo -spdb -sice:ICE71 -sice:ICE61 -ext WixUtilExtension.dll -out ThreeFoldNetworkConnector-0.0.0.1-x64.msi ThreeFoldNetworkConnector-0.0.0.1-x64.wixobj
+- wixbin/candle -nologo -out ThreeFoldNetworkConnector-0.0.0.5-x64.wixobj -arch x64 wix.xml
+- wixbin/light -nologo -spdb -sice:ICE71 -sice:ICE61 -ext WixUtilExtension.dll -out ThreeFoldNetworkConnector-0.0.0.5-x64.msi ThreeFoldNetworkConnector-0.0.0.5-x64.wixobj
 
 
 ## Dev
