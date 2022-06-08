@@ -101,7 +101,7 @@ func getConfigPeers() <-chan string {
 			}
 		}
 
-		r <- fmt.Sprintf("\"Peers\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"]", threefoldNodes[0].FullIPAddress, threefoldNodes[1].FullIPAddress, threefoldNodes[2].FullIPAddress, threefoldNodes[3].FullIPAddress, threefoldNodes[4].FullIPAddress, publicNodes[5].FullIPAddress, publicNodes[6].FullIPAddress, publicNodes[7].FullIPAddress, publicNodes[8].FullIPAddress, publicNodes[9].FullIPAddress)
+		r <- fmt.Sprintf("\"Peers\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"]", threefoldNodes[0].FullIPAddress, threefoldNodes[1].FullIPAddress, threefoldNodes[2].FullIPAddress, threefoldNodes[3].FullIPAddress, threefoldNodes[4].FullIPAddress, publicNodes[0].FullIPAddress, publicNodes[1].FullIPAddress, publicNodes[2].FullIPAddress, publicNodes[3].FullIPAddress, publicNodes[4].FullIPAddress)
 	}()
 
 	return r
