@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
+	"github.com/gologme/log"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -63,6 +63,7 @@ type QSystemTrayIconWithCustomSlot struct {
 func (tray *QSystemTrayIconWithCustomSlot) triggerSlot(f func()) { f() } //the slot just needs to call the passed function to execute it inside the main thread
 
 func SetDefaultTexts() {
+	log.Infoln("[UI]: SET DEFAULT TEXTS")
 	connectionTitleLabel = widgets.NewQLabel2("Connection: ", nil, 0)
 	subnetTitleLabel = widgets.NewQLabel2("Subnet: ", nil, 0)
 	ipTitleLabel = widgets.NewQLabel2("IPv6: ", nil, 0)
@@ -86,7 +87,7 @@ func getCurrentConnectionInfo() ConnectionInfo {
 	resp, err := http.Get("http://localhost:62853/connection")
 
 	if err != nil {
-		fmt.Println("Err on connection info")
+		log.Errorln("ERROR IN GET CURRENT CONNECTION INFO")
 	}
 
 	defer resp.Body.Close()
@@ -98,17 +99,20 @@ func getCurrentConnectionInfo() ConnectionInfo {
 
 }
 func raiseWindow() {
+	log.Infoln("[UI]: RAISE WINDOWS")
 	window.Show()
 	window.ActivateWindow()
 	window.Raise()
 }
 
 func DisconnectToYggdrasil() {
+	log.Infoln("[UI]: DISCONNECT")
 	DisconnectToServer()
 	DisconnectUserInterface()
 }
 
 func ConnectToYggdrasil() {
+	log.Infoln("[UI]: CONNECT")
 	ConnectToServer()
 }
 
@@ -159,6 +163,7 @@ func ConnectUserInterface(info ConnectionInfo) {
 }
 
 func UpdateWindowPeers(details ConnectionDetails) {
+	log.Infoln("[UI]: UPDATE PEERS")
 	resetPeerButton.BlockSignals(false)
 
 	if len(details.ConnectionPeers) == 0 {
@@ -172,10 +177,12 @@ func UpdateWindowPeers(details ConnectionDetails) {
 }
 
 func SetWindowConnectedError(info ConnectionInfo) {
+	log.Errorln("[UI]: ALREADY RUNNING")
 	widgets.QMessageBox_Critical(nil, "Yggdrasil already running", " You already have an Yggdrasil client running. Can't connect.", widgets.QMessageBox__Ok, 0)
 }
 
 func ShowPeersInUserInterface() {
+	log.Infoln("[UI]: SHOW PEERS")
 	peersList.Clear()
 	info := fetchConnectionData()
 
@@ -244,6 +251,7 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 }
 
 func CheckCurrentConnection() {
+	log.Infoln("[UI]: GET CURRENT CONNECTION")
 	connInfo := getCurrentConnectionInfo()
 
 	if connInfo.IpAddress == "" {
@@ -268,6 +276,7 @@ func CheckCurrentConnection() {
 }
 
 func StartUserInterface() {
+	log.Infoln("[UI]: START UI")
 	application = widgets.NewQApplication(len(os.Args), os.Args)
 	application.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
 
@@ -298,6 +307,7 @@ func StartUserInterface() {
 }
 
 func CreateLayout() {
+	log.Infoln("[UI]: CREATE LAYOUT")
 	gridLayoutMainWindow = widgets.NewQGridLayout2()
 	gridLayoutPeerWindow = widgets.NewQGridLayout2()
 
@@ -352,7 +362,7 @@ func ListenToSysTrayTriggers() {
 
 	quitMenuAction := systrayMenu.AddAction("Quit")
 	quitMenuAction.ConnectTriggered(func(bool) {
-		println("Exiting application ... ")
+		log.Infoln("[UI]: EXIT APPLICATION")
 		http.Post("http://localhost:62853/exit", "application/json", bytes.NewBuffer(nil))
 		application.Exit(0)
 		os.Exit(0)
@@ -366,16 +376,19 @@ func ListenToSysTrayTriggers() {
 
 func ListenToCopyButtons() {
 	ipButton.ConnectClicked(func(bool) {
+		log.Infoln("[UI]: COPY IP", ipDataLabel.Text())
 		application.Clipboard().SetText(ipDataLabel.Text(), gui.QClipboard__Clipboard)
 	})
 
 	subnetButton.ConnectClicked(func(bool) {
+		log.Infoln("[UI]: COPY SUBNET", subnetDataLabel.Text())
 		application.Clipboard().SetText(subnetDataLabel.Text(), gui.QClipboard__Clipboard)
 	})
 }
 
 func ListenToButtonClicks() {
 	resetPeerButton.ConnectClicked(func(bool) {
+		log.Infoln("[UI]: BUTTON SEARCH NEW")
 		resetPeerButton.BlockSignals(true)
 		resetPeerButton.SetEnabled(false)
 		resetPeerButton.Repaint()
@@ -393,6 +406,7 @@ func ListenToButtonClicks() {
 	})
 
 	showPeersButton.ConnectClicked(func(bool) {
+		log.Infoln("[UI]: BUTTON PEERS")
 		showPeersButton.SetEnabled(false)
 		showPeersButton.Repaint()
 
@@ -409,6 +423,7 @@ func ListenToButtonClicks() {
 	})
 
 	connectButton.ConnectClicked(func(bool) {
+		log.Infoln("[UI]: BUTTON CONNECT")
 		connectButton.SetEnabled(false)
 		connectButton.Repaint()
 

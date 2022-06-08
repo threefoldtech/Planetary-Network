@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gologme/log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -14,9 +15,8 @@ import (
 
 func startNetworkServer() bool {
 
-	fmt.Println("Server not running, starting it up")
-
-	fmt.Println("Asking user for password")
+	log.Infoln("SERVER NOT RUNNING - STARTING")
+	log.Infoln("ASKING USER FOR PASSWORD")
 
 	var password = ""
 	var widget = widgets.NewQWidget(nil, 0)
@@ -27,19 +27,19 @@ func startNetworkServer() bool {
 	dialog.SetInputMethodHints(core.Qt__ImhNone)
 
 	dialog.ConnectAccepted(func() {
-		fmt.Println("Accepted")
+		log.Infoln("ACCEPTED PASSWORD")
 		password = dialog.TextValue()
 		dialog.Close()
 	})
 
 	dialog.ConnectRejected(func() {
-		fmt.Println("Rejected")
+		log.Errorln("REJECTED PASSWORD")
 		os.Exit(1)
 	})
 
 	dialog.Exec()
 
-	fmt.Println("Starting server as root")
+	log.Infoln("STARTING SERVER AS ROOT")
 	startNetworkServerAsRoot(password)
 
 	time.Sleep(2 * time.Second)
@@ -56,7 +56,6 @@ func startNetworkServerAsRoot(password string) {
 		panic(errp)
 	}
 	exPath := filepath.Dir(ex)
-	fmt.Println(exPath)
 
 	cmd := "echo " + password + " | sudo -S \"" + ex + "\" -server"
 
@@ -64,7 +63,6 @@ func startNetworkServerAsRoot(password string) {
 	err := rcmd.Start()
 
 	if err != nil {
-		fmt.Println(err)
-		// os.Exit(1)
+		log.Errorln("ERROR IN START NETWORK SERVER: ", err.Error())
 	}
 }

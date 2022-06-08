@@ -2,9 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/gologme/log"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -12,23 +11,19 @@ import (
 func getPeers() []YggdrasilIPAddress {
 	resp, err := http.Get("https://raw.githubusercontent.com/threefoldtech/planetary_network/main/nodelist")
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Println("Error to fetch peers")
-		fmt.Println("StatusCode: ", resp.StatusCode)
-		log.Fatal(err)
+		log.Errorln("ERROR TO FETCH PEERS FROM GITHUB", err.Error())
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error to read body")
-		log.Fatal(err)
+		log.Errorln("ERROR IN GET PEERS READ BODY")
 	}
 
 	arrayAddresses := []string{}
 	err = json.Unmarshal([]byte(string(body)), &arrayAddresses)
 
 	if err != nil {
-		fmt.Println("Error in parsing")
-		log.Fatal(err)
+		log.Errorln("ERROR IN GET PEERS UNMARSHALL")
 	}
 
 	var ipAddresses []YggdrasilIPAddress

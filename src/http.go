@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"github.com/gologme/log"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -44,18 +44,18 @@ func RetrievePeers() {
 
 		body, err := ioutil.ReadAll(peersResponse.Body)
 		if err != nil {
-			fmt.Errorf("Error in ioutil", err)
+			log.Errorln("ERROR IN RETREIVE PEERS IN READALL", err)
 		}
 
 		if body == nil {
-			fmt.Println("BODY IS NULL")
+			log.Errorln("ERROR IN RETREIVE PEERS BODY IS NULL")
 		}
 
 		var details = &ConnectionDetails{}
 		err = json.Unmarshal([]byte(string(body)), details)
 
 		if err != nil {
-			fmt.Errorf("Error in unmarshall", err)
+			log.Errorln("ERROR IN RETREIVE PEERS IN UNMARSHALL", err)
 		}
 
 		Emit("PEERS_RECEIVED", *details)
@@ -106,15 +106,44 @@ func GetCurrentPeers() []string {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Errorf("Error in ioutil", err)
+		log.Errorln("ERROR IN  GET CURRENT PEERS IOUTIL", err)
 	}
 
 	var details *ConnectionDetails
 	err = json.Unmarshal([]byte(string(body)), &details)
 
 	if err != nil {
-		fmt.Errorf("Error in unmarshall", err)
+		log.Errorln("ERROR IN  GET CURRENT PEERS UNMARSHALL", err)
 	}
 
 	return details.ConnectionPeers
+}
+
+func fetchConnectionData() *ConnectionDetails {
+	resp, err := http.Get("http://localhost:62853/info")
+	if err != nil {
+		panic(err)
+	}
+
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Errorln("ERROR IN FETCH CONNECTION DATA IOUTIL", err)
+	}
+
+	if body == nil {
+		log.Errorln("ERROR IN FETCH CONNECTION DATA BODY NULL", err)
+	}
+
+	var details *ConnectionDetails
+	err = json.Unmarshal([]byte(string(body)), &details)
+
+	if err != nil {
+		log.Errorln("ERROR IN FETCH CONNECTION DATA UNMARSHALL", err)
+	}
+
+	return details
 }
