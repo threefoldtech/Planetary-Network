@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 
 	"github.com/therecipe/qt/core"
