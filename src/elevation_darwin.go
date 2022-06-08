@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gologme/log"
 	"net/http"
 	"os"
@@ -55,7 +54,6 @@ func startNetworkServerAsRoot(password string) {
 	if errp != nil {
 		panic(errp)
 	}
-	exPath := filepath.Dir(ex)
 
 	cmd := "echo " + password + " | sudo -S \"" + ex + "\" -server"
 
