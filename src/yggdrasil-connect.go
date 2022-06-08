@@ -33,7 +33,6 @@ func yggdrasilDisconnect() ConnectionInfo {
 
 func yggdrasilConnect() ConnectionInfo {
 	CleanYggSockets()
-
 	if _, err := os.Stat("/var/run/yggdrasil.sock"); err == nil {
 		connInfo := ConnectionInfo{
 			IpAddress:       "N/A",
@@ -52,14 +51,18 @@ func yggdrasilConnect() ConnectionInfo {
 
 	if logger == nil {
 		logger = log.New(os.Stdout, "", log.Flags())
+		logger.Warnln("Logging defaulting to stdout")
 	}
 
+	logger.EnableLevel("error")
+	logger.EnableLevel("info")
 	var cfg *config.NodeConfig
 	var err error
 
 	if !fileExists(APPLICATION_CONFIG.yggdrasil_config_location) {
 		generateConfigFile(cfg)
 	}
+
 	cfg = readConfig(logger, true, APPLICATION_CONFIG.yggdrasil_config_location, false)
 
 	n = node{config: cfg}
@@ -67,7 +70,8 @@ func yggdrasilConnect() ConnectionInfo {
 	// Now start Yggdrasil - this starts the DHT, router, switch and other core
 	// components needed for Yggdrasil to operate
 	if err = n.core.Start(cfg, logger); err != nil {
-		log.Fatalln("An error occurred during startup:", err)
+		logger.Errorln("An error occurred during startup")
+		log.Errorln("An error occurred during startup")
 		panic(err)
 	}
 
@@ -79,24 +83,30 @@ func yggdrasilConnect() ConnectionInfo {
 
 	// Start the admin socket
 	if err := n.admin.Init(&n.core, cfg, logger, nil); err != nil {
-		log.Fatalln("An error occurred initialising admin socket:", err)
+		logger.Errorln("An error occurred initialising admin socket:", err)
+		log.Errorln("An error occurred initialising admin socket:", err)
 	} else if err := n.admin.Start(); err != nil {
-		log.Fatalln("An error occurred starting admin socket:", err)
+		logger.Errorln("An error occurred starting admin socket:", err)
+		log.Errorln("An error occurred starting admin socket:", err)
 	}
 	n.admin.SetupAdminHandlers(n.admin)
 	// Start the multicast interface
 	if err := n.multicast.Init(&n.core, cfg, logger, nil); err != nil {
-		log.Fatalln("An error occurred initialising multicast:", err)
+		logger.Errorln("An error occurred initialising multicast:", err)
+		log.Errorln("An error occurred initialising multicast:", err)
 	} else if err := n.multicast.Start(); err != nil {
-		log.Fatalln("An error occurred starting multicast:", err)
+		logger.Errorln("An error occurred starting multicast:", err)
+		log.Errorln("An error occurred starting multicast:", err)
 	}
 	n.multicast.SetupAdminHandlers(n.admin)
 	// Start the TUN/TAP interface
 	rwc := ipv6rwc.NewReadWriteCloser(&n.core)
 	if err := n.tuntap.Init(rwc, cfg, logger, nil); err != nil {
-		log.Fatalln("An error occurred initialising TUN/TAP:", err)
+		logger.Errorln("An error occurred initialising TUN/TAP:", err)
+		log.Errorln("An error occurred initialising TUN/TAP:", err)
 	} else if err := n.tuntap.Start(); err != nil {
-		log.Fatalln("An error occurred starting TUN/TAP:", err)
+		logger.Errorln("An error occurred starting TUN/TAP:", err)
+		log.Errorln("An error occurred starting TUN/TAP:", err)
 	}
 
 	n.tuntap.SetupAdminHandlers(n.admin)
@@ -118,9 +128,9 @@ func yggdrasilConnect() ConnectionInfo {
 		listPeers = append(listPeers, string(address))
 	}
 
-	log.Infof("Your public key is %s", hex.EncodeToString(public[:]))
-	log.Infof("Your IPv6 address is %s", address.String())
-	log.Infof("Your IPv6 subnet is %s", subnet.String())
+	log.Infoln("Your public key is %s", hex.EncodeToString(public[:]))
+	log.Infoln("Your IPv6 address is %s", address.String())
+	log.Infoln("Your IPv6 subnet is %s", subnet.String())
 	connInfo := ConnectionInfo{
 		IpAddress:       address.String(),
 		SubnetAddress:   subnet.String(),
@@ -129,7 +139,6 @@ func yggdrasilConnect() ConnectionInfo {
 		Error:           "",
 	}
 	return connInfo
-
 }
 
 func resetApplication() {
