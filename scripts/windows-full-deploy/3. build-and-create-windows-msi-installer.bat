@@ -6,7 +6,7 @@ xcopy /E /I wixbin generated\builds\windows\wixbin
 
 cd generated/builds/windows/
 echo "Finished"
-"wixbin/candle.exe" -nologo -out ThreeFoldPlanetaryNetwork-0.0.0.1-x64.wixobj -arch x64 wix.xml
-"wixbin/light.exe" -nologo -spdb -sice:ICE71 -sice:ICE61 -ext WixUtilExtension.dll -out ThreeFoldPlanetaryNetwork-0.0.0.1-x64.msi ThreeFoldPlanetaryNetwork-0.0.0.1-x64.wixobj
+"wixbin/candle.exe" -nologo -out ThreeFoldPlanetaryNetwork-0.0.0.5-x64.wixobj -arch x64 wix.xml
+"wixbin/light.exe" -nologo -spdb -sice:ICE71 -sice:ICE61 -ext WixUtilExtension.dll -out ThreeFoldPlanetaryNetwork-0.0.0.5-x64.msi ThreeFoldPlanetaryNetwork-0.0.0.5-x64.wixobj
 echo "Finished"
 pause

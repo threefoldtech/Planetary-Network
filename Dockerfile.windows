@@ -1,4 +1,4 @@
 FROM therecipe/qt:windows_64_static as fcitx
 RUN echo "#!/bin/bash" >> /bin/buildwindows
-RUN echo "cd /src/ && $GOPATH/bin/qtdeploy build desktop" >> /bin/buildwindows
+RUN echo "cd /src/ && $GOPATH/bin/qtdeploy build windows" >> /bin/buildwindows
 RUN chmod +x /bin/buildwindows
