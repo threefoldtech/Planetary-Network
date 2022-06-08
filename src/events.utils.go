@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"github.com/gologme/log"
 	"reflect"
 	"sync"
 	"sync/atomic"
@@ -16,7 +16,7 @@ const (
 var CustomEvents = Events{
 	"EVENT_CONNECTED": []Listener{
 		func(payload ...interface{}) {
-			log.Println("EVENT_CONNECTED")
+			log.Infoln("EVENT_CONNECTED")
 
 			connInfo := payload[0].(ConnectionInfo)
 
@@ -31,7 +31,7 @@ var CustomEvents = Events{
 	},
 	"PEERS_RECEIVED": []Listener{
 		func(payload ...interface{}) {
-			log.Println("PEERS_RECEIVED")
+			log.Infoln("PEERS_RECEIVED")
 
 			connDetails := payload[0].(ConnectionDetails)
 			UpdateWindowPeers(connDetails)

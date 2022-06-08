@@ -1,9 +1,12 @@
 package main
 
 import (
+	"os"
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/gologme/log"
 )
 
 func IsThreefoldNode(a []YggdrasilIPAddress, x string) bool {
@@ -58,4 +61,13 @@ func SortBy(jsonField string, arr []PeerSorting) []PeerSorting {
 	})
 
 	return arr
+}
+
+func GetCurrentDirectory() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Errorln(err)
+	}
+
+	return dir
 }

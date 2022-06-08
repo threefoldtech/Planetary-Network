@@ -11,11 +11,10 @@ import (
 	"time"
 
 	"github.com/go-ping/ping"
+	"github.com/gologme/log"
 	"github.com/yggdrasil-network/yggdrasil-go/src/config"
 	"github.com/yggdrasil-network/yggdrasil-go/src/defaults"
 )
-
-var publicYggdrasilPeersURL = "https://publicpeers.neilalexander.dev/"
 
 var wg sync.WaitGroup
 var ipAddresses []YggdrasilIPAddress
@@ -29,50 +28,43 @@ func fileExists(filename string) bool {
 }
 
 func generateConfigFile(cfg *config.NodeConfig) {
-	// if !fileExists("yggdrasil_config_location") {
-	fmt.Println("[info]: Generating config file")
+	log.Infoln("GETTING CONFIG PEERS")
 	var configPeers string
 	configPeers = <-getConfigPeers()
-	fmt.Println("[info]: No config file")
-	fmt.Println("Config file doesnt exist ...")
+
+	log.Infoln("GENERATING CONFIG FILE")
 	cfg = defaults.GenerateConfig()
-	fmt.Println(cfg)
-
-	fmt.Println("[info]: config generated")
-
 	configFile := doGenconf(true)
-	fmt.Println("Config file created")
-	fmt.Println("[info]: Created config file")
-	configFile = strings.ReplaceAll(configFile, "\"Peers\": []", configPeers)
-	fmt.Println("Peers replaced")
-	fmt.Println("[info]: Peers replaced")
+	log.Infoln("CONFIG FILE GENERATED")
 
-	f, err := os.Create(app_config.yggdrasil_config_location)
+	log.Infoln("FILLING IN PEERS")
+	configFile = strings.ReplaceAll(configFile, "\"Peers\": []", configPeers)
+	log.Infoln("PEERS REPLACED")
+
+	f, err := os.Create(APPLICATION_CONFIG.yggdrasil_config_location)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("[err01]: " + err.Error())
+		log.Errorln("ERROR CREATING FILE ON SYSTEM " + err.Error())
 		return
 	}
+
 	l, err := f.WriteString(configFile)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("[err02]: " + err.Error())
+		log.Errorln("ERROR WRITING TEXT INSIDE CONFIG " + err.Error())
 		f.Close()
 		return
 	}
-	fmt.Println("[info]: Config written")
-	fmt.Println(l, "bytes written successfully")
+
+	log.Infoln("CONFIG SUCCESFULLY WRITTEN")
+	log.Infoln(l)
+
 	err = f.Close()
 	if err != nil {
-		fmt.Println(err)
+		log.Errorln("ERROR IN CLOSING FILE", err.Error())
 		return
 	}
-	// }
 }
 
-// Making this function async in some magic go-syntax land.
 func getConfigPeers() <-chan string {
-	fmt.Sprintf("Finding Peers ")
 	r := make(chan string)
 
 	go func() {
@@ -109,7 +101,7 @@ func getConfigPeers() <-chan string {
 
 // Making this function async in some magic go-syntax land.
 func getPeerStats() <-chan []YggdrasilIPAddress {
-	fmt.Sprintf("Finding Peers ")
+	log.Infoln("DIDN'T GET PEERS YET, GETTING PEERS")
 	r := make(chan []YggdrasilIPAddress)
 
 	go func() {
@@ -127,15 +119,12 @@ func getPeerStats() <-chan []YggdrasilIPAddress {
 			return ipAddresses[i].latency < ipAddresses[j].latency
 		})
 
-		fmt.Println(r)
-
 		r <- ipAddresses
 	}()
 
 	return r
 }
 
-// Making this function async in some magic go-syntax land.
 func fillPeers() {
 	go func() {
 		ipAddresses = getPeers()
@@ -156,35 +145,28 @@ func fillPeers() {
 func getAddressInfo(addr YggdrasilIPAddress, index int) {
 	defer wg.Done()
 
-	pinger, err := ping.NewPinger(addr.IPAddress)
+	pinger, _ := ping.NewPinger(addr.IPAddress)
 
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == WINDOWS {
 		pinger.SetPrivileged(true)
 	}
 
 	pinger.Timeout = time.Second / 2
 
-	if err != nil {
-		//panic(err)
-	}
 	pinger.Count = 2
-	err = pinger.Run() // Blocks until finished.
-	if err != nil {
-		// panic(err)
-	}
-	stats := pinger.Statistics()
+	pinger.Run()
 
-	fmt.Println(stats)
+	stats := pinger.Statistics()
 	if stats.AvgRtt.String() == "0s" {
-		fmt.Println("0s so skipped")
 		addr.latency = 9999
 		ipAddresses[index] = addr
+		log.Warnln("PING RESULT:", addr, " (0s)")
 		return
 	}
 
 	addr.RealIP = stats.IPAddr.IP.String()
 	addr.latency, _ = strconv.ParseFloat(strings.ReplaceAll(stats.AvgRtt.String(), "ms", ""), 64)
 
-	fmt.Println(addr)
+	log.Infoln("PING RESULT:", addr)
 	ipAddresses[index] = addr
 }

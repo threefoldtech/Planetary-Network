@@ -26,3 +26,9 @@ type PeerSorting struct {
 	Peer            string
 	isThreefoldNode bool
 }
+
+const (
+	WINDOWS = "windows"
+	OSX     = "darwin"
+	LINUX   = "linux"
+)
