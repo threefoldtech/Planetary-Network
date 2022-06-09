@@ -18,7 +18,7 @@ type Config struct {
 var APPLICATION_CONFIG Config
 
 func InitializeConfig() {
-	dir := GetCurrentDirectory() + "/threefold_yggdrasil.conf"
+	dir := GetThreefoldDirectory() + "threefold_yggdrasil.conf"
 	APPLICATION_CONFIG.yggdrasil_config_location = dir
 
 	log.Infoln("SETTING YGGDRASIL CONFIG ON LOCATION:", APPLICATION_CONFIG.yggdrasil_config_location)

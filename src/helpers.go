@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"sort"
@@ -63,11 +64,19 @@ func SortBy(jsonField string, arr []PeerSorting) []PeerSorting {
 	return arr
 }
 
-func GetCurrentDirectory() string {
-	dir, err := os.Getwd()
+func GetThreefoldDirectory() string {
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Errorln(err)
 	}
 
-	return dir
+	homeDir += "/Threefold/"
+	err = os.MkdirAll(homeDir, os.ModePerm)
+
+	if err != nil {
+		fmt.Println("IS THERE AN ERROR")
+		fmt.Println(err)
+	}
+
+	return homeDir
 }

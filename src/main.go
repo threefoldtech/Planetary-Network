@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Add Logging (for some reasons, this cannot be in seperate function)
-	f, err := os.OpenFile(GetCurrentDirectory()+"/tf-planetary-connector.log", os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0666)
+	f, err := os.OpenFile(GetThreefoldDirectory()+"tf-planetary-connector.log", os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0666)
 
 	if err != nil {
 		log.Errorln("Error opening file: %v", err)
