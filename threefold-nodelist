@@ -1,5 +1,5 @@
 [
-  "tf-tcp://gent01.grid.tf:9943",
+  	"tf-tcp://gent01.grid.tf:9943",
 	"tf-tcp://gent02.grid.tf:9943",
 	"tf-tcp://gent03.grid.tf:9943",
 	"tf-tcp://gent04.grid.tf:9943",
