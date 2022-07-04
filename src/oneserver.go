@@ -3,13 +3,13 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
+	"github.com/gologme/log"
 )
 
 func startOneServer() {
-	fmt.Println("Running in the single instance server")
+	log.Infoln("RUNNING SERVER IN SINGLE INSTANCE MODE")
+
 	router := gin.Default()
 	router.GET("/raise", raise)
 	router.Run("127.0.0.1:62854")
@@ -17,5 +17,7 @@ func startOneServer() {
 
 }
 func raise(c *gin.Context) {
+	log.Infoln("RAISING WINDOW")
+
 	raiseWindow()
 }

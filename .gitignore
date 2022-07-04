@@ -11,3 +11,7 @@ tf-network-connector-linux
 *.deb
 yggdrasil-desktop-client
 generated
+wixbin
+
+tf-planetary-connector.log
+threefold_yggdrasil.conf

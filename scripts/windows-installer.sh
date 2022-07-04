@@ -18,8 +18,8 @@ fi
 GOOS=windows GOARCH=amd64 CGO_ENABLED=0 ./build.sh
 
 PKGNAME="ThreeFoldNetworkConnector"
-PKGVERSION="0.0.0.1"
-PKGVERSIONMS="0.0.0.1"
+PKGVERSION="0.0.0.5"
+PKGVERSIONMS="0.0.0.5"
 [ "x64" == "x64" ] && \
   PKGGUID="77757838-1a23-40a5-a720-c3b43e0260cc" PKGINSTFOLDER="ProgramFiles64Folder" || \
   PKGGUID="54a3294e-a441-4322-aefb-3bb40dd022bb" PKGINSTFOLDER="ProgramFilesFolder"

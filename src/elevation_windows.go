@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gologme/log"
 	"os"
 	"syscall"
 
@@ -27,11 +27,6 @@ func startNetworkServerAsAdmin() {
 
 	err := windows.ShellExecute(0, verbPtr, exePtr, argPtr, cwdPtr, showCmd)
 	if err != nil {
-		fmt.Println(err)
+		log.Errorln("ERROR IN START NETWORK SERVER: ", err.Error())
 	}
-}
-
-func cleanupYggdrasilSock(password string) string {
-	//dummy or todo
-	return ""
 }
