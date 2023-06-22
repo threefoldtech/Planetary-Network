@@ -28,6 +28,6 @@ echo "adding reference to /Application directory path."
 ln -s /Applications src/deploy/darwin/Applications
 
 echo "Generation executable dmg file."
-hdiutil create "ThreeFold Planetary Network" -srcfolder src/deploy/darwin/
+hdiutil create "ThreeFold Planetary Network" -srcfolder src/deploy/darwin/ -volname ThreefoldPlanetaryNetwork
 
 echo "Completed."
