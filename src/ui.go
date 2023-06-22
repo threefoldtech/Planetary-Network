@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/gologme/log"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gologme/log"
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -232,6 +233,7 @@ func AddLayout() {
 
 }
 
+// TODO: context is not used
 func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	// Initialize windows
 	StartUserInterface()
@@ -247,7 +249,11 @@ func userInterface(args yggArgs, ctx context.Context, done chan struct{}) {
 	CheckCurrentConnection()
 
 	window.Show()
-	application.Exec()
+	application.ConnectAboutToQuit(func() {
+		close(done)
+	})
+	applicationResult := application.Exec()
+	log.Debugln("QTAplication result:", applicationResult)
 }
 
 func CheckCurrentConnection() {
@@ -278,6 +284,7 @@ func CheckCurrentConnection() {
 func StartUserInterface() {
 	log.Infoln("[UI]: START UI")
 	application = widgets.NewQApplication(len(os.Args), os.Args)
+
 	application.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
 
 	mainWindow = widgets.NewQWidget(nil, 0)

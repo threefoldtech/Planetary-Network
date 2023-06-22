@@ -25,6 +25,7 @@ func main() {
 
 	log.SetOutput(f)
 
+	log.EnableLevel("debug")
 	log.EnableLevel("info")
 	log.EnableLevel("warn")
 	log.EnableLevel("error")
@@ -64,7 +65,10 @@ func main() {
 			for {
 				done := make(chan struct{})
 				ctx, cancel := context.WithCancel(context.Background())
+				//TODO: this function is blocking as it calls [QApplication::exec()](https://doc.qt.io/qt-5/qapplication.html#exec)
+				// so I don't quite get how this is supposed to work
 				userInterface(args, ctx, done)
+				log.Info("User interface created")
 				select {
 				case <-hup:
 					cancel()

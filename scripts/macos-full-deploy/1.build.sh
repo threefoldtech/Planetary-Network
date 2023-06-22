@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 echo "ThreeFold Planetary Network build script"
 
 echo "Cleaning old build artifacts"
@@ -13,7 +15,7 @@ qtdeploy build darwin ./
 
 cd ..
 
-echo overwriting the application bundle information
+echo "replacing the application bundle information"
 cp "resources/Info.plist" "src/deploy/darwin/src.app/Contents/Info.plist"
 
 echo "Renaming"
